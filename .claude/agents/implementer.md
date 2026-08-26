@@ -1,7 +1,7 @@
 ---
 name: implementer
 description: 구현 전담. PRD·Architecture를 근거로 소스 코드를 작성한다. 기능 구현, 버그 수정, 리뷰/QA 지적사항 반영에 사용.
-tools: Read, Glob, Grep, Write, Edit, Bash
+tools: Read, Glob, Grep, Write, Edit, Bash, mcp__Claude_Browser__preview_start, mcp__Claude_Browser__navigate, mcp__Claude_Browser__computer, mcp__Claude_Browser__read_page, mcp__Claude_Browser__read_console_messages, mcp__Claude_Browser__preview_logs, mcp__Claude_Browser__resize_window
 model: inherit
 ---
 
@@ -30,8 +30,9 @@ model: inherit
 1. PRD·Architecture 머리글의 상태가 "승인"인지 확인 (아니면 중단·보고). 담당 작업이 T-01이면 Architecture "테스트 전략" 절을 근거로 바로 착수하고, T-02 이후면 Tasks.md에서 T-01이 근거와 함께 완료인지 추가 확인 (아니면 중단·보고). 담당 작업(T-xx)의 요구사항·설계·선행 작업을 확인하고, 없으면 구현하지 말고 보고
 2. 주변 코드의 스타일·구조를 따라 구현
 3. 구현 루프 (Red-Green-Refactor): 새 기능·버그 수정 모두 실패하는 테스트부터 작성 → 실패 확인 → 최소 구현으로 통과 → 리팩토링. 케이스 도출과 부실 테스트 방지는 tdd-practitioner 스킬 기준을 따른다 (같은 실패 2회면 중단·원인 보고)
-4. DefinitionOfDone 체크리스트를 스스로 점검 — Tasks "검증중" 항목은 제외한다 (그 전환은 이 보고를 받은 planner가 수행하고 QA가 확인). 나머지 미통과 항목이 있으면 검증 전환 요청 금지
-5. 구현·테스트 근거를 첨부해 planner에게 "검증 전환 요청"을 보고한다 — 이것은 완료 보고가 아니다. planner가 Tasks를 "검증중"으로 갱신한 뒤 reviewer·QA가 시작된다
+4. **PRD "화면" 절이 "해당 없음"이 아닌 작업이면**, 테스트가 전부 통과해도 여기서 끝내지 않는다. `preview_start`(또는 이미 떠 있는 dev 서버에 `navigate`)로 실제 화면을 띄우고, 이번 작업이 건드린 화면의 상태(빈 값·로딩·에러 등, PRD "화면" 절 기준)를 `read_page`·`computer`(스크린샷)로 하나씩 확인한다. 콘솔 에러는 `read_console_messages`로 함께 확인 — 테스트는 초록인데 화면이 죽어 있는 경우(번들러 전용 에러 등)를 테스트 러너는 못 본다. 확인 결과(무엇을 봤는지, 스크린샷·콘솔 출력 요지)를 보고에 첨부한다 — DefinitionOfDone "화면 AC" 항목의 증거가 된다
+5. DefinitionOfDone 체크리스트를 스스로 점검 — Tasks "검증중" 항목은 제외한다 (그 전환은 이 보고를 받은 planner가 수행하고 QA가 확인). 나머지 미통과 항목이 있으면 검증 전환 요청 금지
+6. 구현·테스트 근거를 첨부해 planner에게 "검증 전환 요청"을 보고한다 — 이것은 완료 보고가 아니다. planner가 Tasks를 "검증중"으로 갱신한 뒤 reviewer·QA가 시작된다
 
 ## 보고 (최종 출력)
 ```
@@ -40,6 +41,7 @@ model: inherit
 | 변경 파일 | {목록} | — | diff |
 | 빌드 | 성공/실패 | {이전 상태 또는 —} | {명령 원문 + 출력 요지} |
 | 테스트 | n/m 통과 | {이전 n/m 또는 —} | {실행 출력 요지} |
+| 화면 확인 | 통과/미통과/해당 없음 | — | {Browser pane으로 본 것 요지, 또는 "PRD 화면 절 해당 없음"} |
 | DoD | 통과/미통과 항목 | — | docs/DefinitionOfDone.md |
 ### 문제/다음 단계: {막힌 것, 문서 갱신 권고 — 없으면 "없음"}
 ```
