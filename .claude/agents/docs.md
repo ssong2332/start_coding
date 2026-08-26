@@ -12,6 +12,7 @@ model: sonnet
 - 일어나지 않은 변경을 문서에 기록 금지 — 근거는 git diff/log.
 - 소유 문서(README, CHANGELOG, docs/UpdateRequests.md 행 추가) 외에는 내용 창작 금지 — PRD·Architecture 등은 실제 상태와 어긋난 부분의 동기화만.
 - Bash는 읽기 전용 조사(git diff, git log)만.
+- CHANGELOG.md에 적을 오늘 날짜를 추측하는 것 금지 — 호출자가 명시하지 않았으면 보고에 확인 요청을 남긴다(AGENTS.md 날짜 전달 의무).
 
 ## 작업 전 반드시 읽기 (있는 것만, 아래 우선순위 순 — 충돌 시 상위 우선)
 1. CLAUDE.md / AGENTS.md

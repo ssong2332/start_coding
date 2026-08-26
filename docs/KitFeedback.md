@@ -46,3 +46,14 @@
 3. 고친 뒤 `node .claude/hooks/contract-check.js --report`로 새 모순이 생기지 않았는지 확인한다.
 4. 규칙 문구를 바꿨으면 **옛 문구를 리포 전체에서 검색해 잔존분을 함께 고친다** (문구 하나가 여러 문서에 흩어져 있다).
 5. 반영 후 원래 행의 상태를 `반영됨 + 커밋 해시`로 갱신한다.
+
+## 반대 방향: 마스터 갱신을 진행 중 프로젝트로 가져오는 법
+
+`scripts/init.ps1`·`init.sh`는 템플릿→프로젝트 방향(1회성 초기화)만 다룬다. 프로젝트를 진행하다 start_coding 마스터가 개선되면, 그 개선을 이미 시작한 프로젝트로 가져오는 자동화된 절차는 이 킷에 없다 — 아래는 수동 절차다.
+
+1. start_coding 마스터에서 무엇이 바뀌었는지 `git log`·`git diff`로 확인한다.
+2. 바뀐 파일이 `{{PROJECT_NAME}}`·`{{DATE}}` 플레이스홀더를 담지 않는 파일(`AGENTS.md`, `.claude/agents/*.md`, `.claude/hooks/*`, `.codex/hooks.json`, `.agents/hooks.json`, `.agents/skills/*` 등 — init 스크립트의 치환 대상이 아닌 파일)이면, 마스터의 최신 버전을 프로젝트에 그대로 덮어써도 안전하다.
+3. 바뀐 파일이 `docs/*.md`·`README.md`(init 스크립트의 치환 대상)면 통째로 덮지 않는다 — 이미 프로젝트명·날짜가 치환돼 있고, 실제 프로젝트 내용(PRD 요구사항 등)이 같은 파일에 섞여 있을 수 있다. 마스터의 diff를 보고 **바뀐 줄만** 프로젝트 파일에 수동으로 반영한다.
+4. 반영 후 프로젝트에서 `node .claude/hooks/contract-check.js --report`로 확인한다.
+
+이 문제 자체가 `대기` 행으로 기록된 적 있다 — 여러 프로젝트에서 이 수작업이 반복되면 `scripts/sync-from-template`류 스크립트 신설을 검토한다.
