@@ -153,7 +153,7 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 | README.md | docs | 읽기 전용 |
 | docs/PRD.md, docs/Tasks.md | planner | docs는 동기화 가능, 그 외 읽기 전용 (예외: 머리글 상태의 "승인" 전환은 사용자) |
 | docs/Architecture.md, docs/DECISIONS.md, docs/adr/ | architect | docs는 동기화 가능, 그 외 읽기 전용 (승인된 ADR은 불변, 머리글 상태의 "승인" 전환은 사용자) |
-| docs/CodingRules.md | 사용자 (요청 시 architect) | 검증된 명령어 절만 implementer 추가 가능 |
+| docs/CodingRules.md | 사용자 (요청 시 architect) | 검증된 명령어 절: implementer가 새 행 추가 가능. 기존 명령을 완전히 교체해야 하면(예: 패키지 매니저 변경) 옛 행을 지우지 않고 취소선 처리 + 교체 사유 한 줄을 남기고 새 행을 추가한다 — 행 삭제는 사용자만 |
 | docs/GitWorkflow.md, docs/DefinitionOfDone.md | 사용자 | 읽기 전용 |
 | docs/CHANGELOG.md | docs | 읽기 전용 |
 | docs/ToolPacks.md | 사용자 | 읽기 전용 (설치 팩 카탈로그) |
