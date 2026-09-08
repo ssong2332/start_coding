@@ -9,11 +9,11 @@
 
 roles:
   planner: claude
-  architect: claude
+  architect: antigravity
   implementer: codex
-  reviewer: claude
+  reviewer: antigravity
   qa: codex
-  docs: claude
+  docs: antigravity
 
 # 각 provider의 실행 방법. 2026-09-08 실측 검증됨 — 원문 그대로 재사용한다(AGENTS.md "명령어는 검증된 원문 재사용").
 # {prompt}는 pipeline.ps1이 role.md + AGENTS.md 참조 + 관련 docs 경로를 조합해 채운다.
@@ -34,7 +34,9 @@ providers:
 
   antigravity:
     command: agy
-    args: ["-p", "--dangerously-skip-permissions"]
+    args: ["--dangerously-skip-permissions", "-p"]
     # 2026-09-08 실측: --mode accept-edits만으로는 read_file조차 자동 거부됨(헤드리스 모드가 permissions.allow를 무시하는
     # 알려진 버그, google-antigravity/antigravity-cli#548). 범위 한정된 승인 옵션이 없어 전체 우회 플래그가 사실상 유일한 선택지.
+    # 2026-09-09 실측: -p를 먼저 두면 agy가 다음 토큰(--dangerously-skip-permissions)을 프롬프트로 오인해 진짜 프롬프트를
+    # 무시한다("-p took ... as its prompt" 에러) — pipeline.ps1이 프롬프트를 args 맨 뒤에 붙이므로 -p가 항상 마지막이어야 한다.
     risk: 높음 — 전체 권한 우회, 범위 한정 옵션 없음. pipeline.ps1은 이 provider를 쓰는 role마다 사람 확인을 한 번 더 요구한다
