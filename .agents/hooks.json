@@ -13,5 +13,15 @@
         ]
       }
     ]
+  },
+  "syntax-guard": {
+    "enabled": true,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node scripts/check-syntax.js",
+        "timeout": 10
+      }
+    ]
   }
 }

@@ -20,7 +20,8 @@
       {
         "matcher": "Edit|Write",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/contract-check.js" }
+          { "type": "command", "command": "node .claude/hooks/contract-check.js" },
+          { "type": "command", "command": "node scripts/check-syntax.js" }
         ]
       }
     ]
