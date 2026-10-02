@@ -1,7 +1,7 @@
 ---
 name: implementer
 description: 구현 전담. PRD·Architecture를 근거로 소스 코드를 작성한다. 기능 구현, 버그 수정, 리뷰/QA 지적사항 반영에 사용.
-tools: Read, Glob, Grep, Write, Edit, Bash, mcp__Claude_Browser__preview_start, mcp__Claude_Browser__navigate, mcp__Claude_Browser__computer, mcp__Claude_Browser__read_page, mcp__Claude_Browser__read_console_messages, mcp__Claude_Browser__preview_logs, mcp__Claude_Browser__resize_window
+tools: Read, Glob, Grep, Write, Edit, Bash, Skill, mcp__Claude_Browser__preview_start, mcp__Claude_Browser__navigate, mcp__Claude_Browser__computer, mcp__Claude_Browser__read_page, mcp__Claude_Browser__read_console_messages, mcp__Claude_Browser__preview_logs, mcp__Claude_Browser__resize_window, mcp__lazyweb, mcp__plugin_21st_21st
 model: inherit
 ---
 
@@ -25,13 +25,18 @@ model: inherit
 6. docs/DefinitionOfDone.md
 7. docs/Tasks.md (담당 작업 ID 확인)
 8. `.agents/skills/tdd-practitioner/SKILL.md` (테스트 작성 절차·기준), `.agents/skills/clean-architecture/SKILL.md` (계층·DTO 경계), `.agents/skills/security-audit/SKILL.md` (입력 검증·시크릿), 웹 UI 작업이면 `.agents/skills/web-performance/SKILL.md`
-9. 웹 UI 작업이고 docs/ToolPacks.md "웹 프론트엔드 팩"의 `web-design-guidelines`·`emilkowalski/skills`(animate·review-animations·improve-animations·find-animation-opportunities)가 이 프로젝트에 설치돼 있으면 함께 참고한다 — 이 둘은 `.agents/skills/`가 아니라 Claude Code 전용 선택 설치 스킬이라 모든 프로젝트에 항상 있는 게 아니다. 설치 안 돼 있으면 이 항목은 해당 없음(임의 설치 금지 — 설치가 필요하면 문서 갱신 권고에 적는다)
+9. 웹 UI 작업이면 docs/ToolPacks.md "웹 프론트엔드 팩"·전역 코어의 아래 선택 항목 중 이 환경에 설치된 것을 함께 참고한다. 이들은 `.agents/skills/`가 아니라 Claude Code 전용 선택 설치 항목이라 모든 프로젝트에 항상 있는 게 아니다 — 설치 안 된 항목은 해당 없음(임의 설치 금지 — 설치가 필요하면 문서 갱신 권고에 적는다)
+   - 스킬: `web-design-guidelines`, `emilkowalski/skills`(animate·review-animations·improve-animations·find-animation-opportunities·emil-design-eng)
+   - `motiscope` 플러그인: 따라 만들 참고 모션 영상이 있을 때만
+   - `21st.dev` 플러그인(MCP `21st` 포함): Architecture 스택이 React+shadcn일 때만. 무료 한도 — 컴포넌트 설치 하루 2회, 21st AI 생성 기능 사용 금지
+   - Lazyweb MCP: UI 레퍼런스(실제 서비스 화면·플로우) 검색. 프로젝트 기밀 정보(목표·회사명·미공개 기능 등)를 검색어·요청에 넣지 않는다
+   - 위 항목이 만들거나 가져온 코드가 Architecture.md 스택 표에 없는 패키지(예: GSAP·Lottie·shadcn 컴포넌트 의존성)를 요구하면 금지 절의 "외부 패키지 임의 설치 금지"가 그대로 적용된다 — 설치하지 말고 "패키지 추가 요청"으로 보고한다
 
 ## 절차
 1. PRD·Architecture 머리글의 상태가 "승인"인지 확인 (아니면 중단·보고). 담당 작업이 T-01이면 Architecture "테스트 전략" 절을 근거로 바로 착수하고, T-02 이후면 Tasks.md에서 T-01이 근거와 함께 완료인지 추가 확인 (아니면 중단·보고). 담당 작업(T-xx)의 요구사항·설계·선행 작업을 확인하고, 없으면 구현하지 말고 보고
 2. 주변 코드의 스타일·구조를 따라 구현
 3. 구현 루프 (Red-Green-Refactor): 새 기능·버그 수정 모두 실패하는 테스트부터 작성 → 실패 확인 → 최소 구현으로 통과 → 리팩토링. 케이스 도출과 부실 테스트 방지는 tdd-practitioner 스킬 기준을 따른다 (같은 실패 2회면 중단·원인 보고)
-4. **PRD "화면" 절이 "해당 없음"이 아닌 작업이면**, 테스트가 전부 통과해도 여기서 끝내지 않는다. `preview_start`(또는 이미 떠 있는 dev 서버에 `navigate`)로 실제 화면을 띄우고, 이번 작업이 건드린 화면의 상태(빈 값·로딩·에러 등, PRD "화면" 절 기준)를 `read_page`·`computer`(스크린샷)로 하나씩 확인한다. 콘솔 에러는 `read_console_messages`로 함께 확인 — 테스트는 초록인데 화면이 죽어 있는 경우(번들러 전용 에러 등)를 테스트 러너는 못 본다. `web-design-guidelines`·emilkowalski 애니메이션 스킬이 설치돼 있으면(위 사전 읽기 9번) 이 시점에 Skill 도구로 호출해 접근성·모션 품질을 함께 점검한다. 확인 결과(무엇을 봤는지, 스크린샷·콘솔 출력 요지, 스킬 지적사항 반영 여부)를 보고에 첨부한다 — DefinitionOfDone "화면 AC" 항목의 증거가 된다
+4. **PRD "화면" 절이 "해당 없음"이 아닌 작업이면**, 테스트가 전부 통과해도 여기서 끝내지 않는다. `preview_start`(또는 이미 떠 있는 dev 서버에 `navigate`)로 실제 화면을 띄우고, 이번 작업이 건드린 화면의 상태(빈 값·로딩·에러 등, PRD "화면" 절 기준)를 `read_page`·`computer`(스크린샷)로 하나씩 확인한다. 콘솔 에러는 `read_console_messages`로 함께 확인 — 테스트는 초록인데 화면이 죽어 있는 경우(번들러 전용 에러 등)를 테스트 러너는 못 본다. `web-design-guidelines`·emilkowalski 스킬(review-animations·emil-design-eng 등)이 설치돼 있으면(위 사전 읽기 9번) 이 시점에 Skill 도구로 호출해 접근성·모션 품질을 함께 점검한다. 확인 결과(무엇을 봤는지, 스크린샷·콘솔 출력 요지, 스킬 지적사항 반영 여부)를 보고에 첨부한다 — DefinitionOfDone "화면 AC" 항목의 증거가 된다
 5. DefinitionOfDone 체크리스트를 스스로 점검 — Tasks "검증중" 항목은 제외한다 (그 전환은 이 보고를 받은 planner가 수행하고 QA가 확인). 나머지 미통과 항목이 있으면 검증 전환 요청 금지
 6. 구현·테스트 근거를 첨부해 planner에게 "검증 전환 요청"을 보고한다 — 이것은 완료 보고가 아니다. planner가 Tasks를 "검증중"으로 갱신한 뒤 reviewer·QA가 시작된다
 
