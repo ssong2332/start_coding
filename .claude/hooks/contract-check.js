@@ -10,6 +10,7 @@ const path = require("path");
 
 const ROOT = process.cwd();
 const AGENTS_DIR = path.join(ROOT, ".claude", "agents");
+const CODEX_AGENTS_DIR = path.join(ROOT, ".codex", "agents");
 const SKILLS_DIR = path.join(ROOT, ".agents", "skills");
 const AGENTS_MD = path.join(ROOT, "AGENTS.md");
 
@@ -58,10 +59,43 @@ function checkAgentRoster(findings) {
   }
 }
 
+// C7: Codex 역할 6종이 존재하고, 필수 TOML 필드·이름·마스터 규칙 참조가 맞는가
+function checkCodexAgentRoster(findings) {
+  const expected = ["planner", "architect", "implementer", "reviewer", "quality_assurance", "docs"];
+  const agentsMd = read(AGENTS_MD);
+  for (const name of expected) {
+    const file = `${name}.toml`;
+    const body = read(path.join(CODEX_AGENTS_DIR, file));
+    if (!body) {
+      findings.push(`C7 .codex/agents/${file}: 역할 정의가 없다.`);
+      continue;
+    }
+    const declared = body.match(/^name\s*=\s*"([^"]+)"\s*$/m)?.[1];
+    if (declared !== name) {
+      findings.push(`C7 .codex/agents/${file}: name 필드가 파일명과 다르다.`);
+    }
+    const description = body.match(/^description\s*=\s*"([^"]*)"\s*$/m)?.[1];
+    if (!description?.trim()) {
+      findings.push(`C7 .codex/agents/${file}: description 필드가 비어 있거나 없다.`);
+    }
+    const instructions = body.match(/^developer_instructions\s*=\s*"""([\s\S]*?)"""\s*$/m)?.[1];
+    if (!instructions?.trim()) {
+      findings.push(`C7 .codex/agents/${file}: developer_instructions 필드가 비어 있거나 없다.`);
+    } else if (!instructions.includes("AGENTS.md")) {
+      findings.push(`C7 .codex/agents/${file}: AGENTS.md 참조가 없다.`);
+    }
+    const roleName = name === "quality_assurance" ? "quality-assurance" : name;
+    if (agentsMd && !agentsMd.includes(roleName)) {
+      findings.push(`C7 AGENTS.md: Codex 역할 "${roleName}" 이 등재되지 않았다.`);
+    }
+  }
+}
+
 // C2: 문서들이 참조하는 docs/*.md 와 .agents/skills/*/SKILL.md 가 실제로 존재하는가
 function checkReferences(findings) {
   const targets = [AGENTS_MD, path.join(ROOT, "README.md"), path.join(ROOT, "CLAUDE.md")]
     .concat(listFiles(AGENTS_DIR, ".md").map((f) => path.join(AGENTS_DIR, f)))
+    .concat(listFiles(CODEX_AGENTS_DIR, ".toml").map((f) => path.join(CODEX_AGENTS_DIR, f)))
     .concat(listFiles(path.join(ROOT, "docs"), ".md").map((f) => path.join(ROOT, "docs", f)));
 
   for (const file of targets) {
@@ -183,6 +217,7 @@ function runChecks() {
   const findings = [];
   try {
     checkAgentRoster(findings);
+    checkCodexAgentRoster(findings);
     checkReferences(findings);
     checkSkillRoster(findings);
     checkOwnership(findings);
@@ -202,6 +237,7 @@ if (process.argv.includes("--report")) {
 
 const WATCHED = [
   ".claude/agents/",
+  ".codex/agents/",
   ".agents/skills/",
   "AGENTS.md",
   "CLAUDE.md",

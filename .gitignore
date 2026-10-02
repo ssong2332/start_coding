@@ -29,3 +29,6 @@ venv/
 .env.*
 !.env.example
 *.local
+
+# 로컬 검증 증거 (커밋 대상 아님)
+.artifacts/verification/

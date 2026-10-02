@@ -1,7 +1,8 @@
 /**
  * Antigravity PreToolUse 가드 — .claude/hooks/ 의 안티그래비티 대응물.
- * 배선은 .agents/hooks.json: `node scripts/agy-guard.js` (cwd=워크스페이스 루트 전제).
- * 전제가 어긋나면 훅이 조용히 무동작한다 — 확인법은 .claude/hooks/README.md 참조.
+ * 배선은 .agents/hooks.json: `node scripts/agy-guard.js`.
+ * 루트에서는 본체, .agents에서는 프로젝트 루트로 이동하는 얇은 진입점을 실행한다.
+ * 진입점 모듈이 없으면 도구 실행이 차단될 수 있다 — 확인법은 .claude/hooks/README.md 참조.
  *
  * 강제하는 규칙 (원본은 문서, 여기는 물리 차단 계층). .claude/hooks/의 3개
  * 가드(block-main-writes·block-no-verify·block-env-access)와 규칙을 공유하므로
