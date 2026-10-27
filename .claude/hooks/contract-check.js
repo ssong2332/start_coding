@@ -151,8 +151,10 @@ function checkOwnership(findings) {
 // (scripts/init.* 의 치환 대상은 README.md 와 docs/**.md 뿐이다.
 //  그 밖의 파일에 {{...}} 를 두면 새 프로젝트에서 영원히 치환되지 않는다.)
 function checkPlaceholders(findings) {
-  // .artifacts 는 Git 제외 증거·핸드오프 보관소라 init 치환 대상이 아니다
-  const SKIP = new Set([".git", "node_modules", "docs", ".vscode", ".artifacts"]);
+  const SKIP = new Set([".git", "node_modules", ".vscode"]);
+  // 루트의 docs/(init 치환 대상)와 .artifacts/(Git 제외 증거·핸드오프 보관소)만 건너뛴다 —
+  // 이름만 보고 하위의 같은 이름 폴더까지 건너뛰면 검사가 빠진다(2026-10-27 재리뷰 권고 4)
+  const ROOT_SKIP = new Set(["docs", ".artifacts"]);
   const PATTERN = /\{\{[A-Z0-9_]+\}\}/;
   const walk = (dir) => {
     let entries = [];
@@ -166,7 +168,7 @@ function checkPlaceholders(findings) {
       const rel = path.relative(ROOT, full).replace(/\\/g, "/");
       if (e.isDirectory()) {
         // .claude/worktrees/ 는 다른 브랜치의 킷 사본이라 이 리포의 모순이 아니다
-        if (!SKIP.has(e.name) && rel !== ".claude/worktrees") walk(full);
+        if (!SKIP.has(e.name) && !ROOT_SKIP.has(rel) && rel !== ".claude/worktrees") walk(full);
         continue;
       }
       if (rel === "README.md" || rel.startsWith("docs/")) continue; // init 치환 대상

@@ -98,10 +98,11 @@ function main() {
             /-c\s*core\.hooksPath=/,
             /\bconfig\b[^\n]*core\.hooksPath\b/, // git config core.hooksPath <경로> (영구 설정)
           ];
-          const shortFlag = /\bgit\b/.test(command) && findCommitNoVerifyShortFlag(command);
+          // Windows는 실행 파일 이름 대소문자를 가리지 않는다(GIT.EXE도 git) — 재리뷰 권고 5
+          const shortFlag = /\bgit\b/i.test(command) && findCommitNoVerifyShortFlag(command);
           const skipHit = shortFlag
             ? `git commit ${shortFlag}`
-            : /\bgit\b/.test(command) && skipPatterns.find((p) => p.test(command));
+            : /\bgit\b/i.test(command) && skipPatterns.find((p) => p.test(command));
           if (skipHit) {
             output({
               decision: "deny",
@@ -111,9 +112,9 @@ function main() {
           }
 
           // 2-3. main/master 브랜치 직접 커밋 검사
-          const isCommit = /\bgit\s+commit\b/.test(command);
+          const isCommit = /\bgit(?:\.exe)?\s+commit\b/i.test(command);
           const refspec = command.match(
-            /\bgit\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/
+            /\bgit(?:\.exe)?\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/i
           );
 
           if (isCommit || refspec) {

@@ -67,6 +67,9 @@ for (const [label, cwd] of [["root", root], [".agents", path.join(root, ".agents
     ["windows backslash git path (review critical 2)", { toolCall: { name: "run_command", args: { CommandLine: '"C:\\Program Files\\Git\\cmd\\git.exe" commit -n' } } }, "deny"],
     ["backtick subshell (review critical 3)", { toolCall: { name: "run_command", args: { CommandLine: "echo `git commit -n`" } } }, "deny"],
     ["redirect attached to flag (review critical 3)", { toolCall: { name: "run_command", args: { CommandLine: "git commit -n>/dev/null" } } }, "deny"],
+    ["uppercase git executable (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT.EXE commit -n -m x" } } }, "deny"],
+    ["uppercase git long flag (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT commit --no-" + "verify" } } }, "deny"],
+    ["uppercase git refspec push to main (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT.EXE push origin fix/x:main" } } }, "deny"],
     ["malformed JSON retains fail-open contract", "{invalid", "allow"],
     ["empty input", "", "allow"],
   ];

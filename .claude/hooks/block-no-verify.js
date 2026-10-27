@@ -17,7 +17,8 @@ try {
 
 readHookInput((payload) => {
   const command = payload?.tool_input?.command;
-  if (typeof command !== "string" || !/\bgit\b/.test(command)) process.exit(0);
+  // Windows는 실행 파일 이름 대소문자를 가리지 않는다(GIT.EXE도 git) — 재리뷰 권고 5
+  if (typeof command !== "string" || !/\bgit\b/i.test(command)) process.exit(0);
 
   const skipPatterns = [
     /--no-verify\b/,

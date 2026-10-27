@@ -93,6 +93,10 @@ const CASES = [
   ["block-no-verify.js", bash(`git -c alias.c=commit c -n`), "BLOCK", "별칭 경유 커밋 (재리뷰 권고 8)"],
   ["block-no-verify.js", bash(`git -C repo commit -n -m x`), "BLOCK", "commit 앞의 git 전역 옵션"],
   ["block-no-verify.js", bash(`cd repo && ${GC} -nm x`), "BLOCK", "연결된 명령 구간 안의 커밋"],
+  // Windows는 파일 이름 대소문자를 가리지 않아 GIT.EXE도 git으로 실행된다 (재리뷰 권고 5)
+  ["block-no-verify.js", bash(`GIT.EXE commit -n -m x`), "BLOCK", "대문자 실행 파일 이름 + 짧은 플래그"],
+  ["block-no-verify.js", bash(`GIT commit --no-` + "verify"), "BLOCK", "대문자 git + 장문형"],
+  ["block-no-verify.js", bash(`Git commit -nm x`), "BLOCK", "섞인 대소문자 + 클러스터"],
   // confirm-agy-delegate — 안티그래비티 권한 우회 실행은 매번 사용자 확인 (리뷰 권고 4)
   ["confirm-agy-delegate.js", bash(`agy --dangerously-skip-permissions -p "Read x/prompt.md"`), "ASK", "권한 우회 위임 실행"],
   ["confirm-agy-delegate.js", bash(`cd repo && agy.exe --dangerously-skip-permissions -p "x"`), "ASK", "연결 명령·.exe 이름"],
@@ -110,6 +114,7 @@ const CASES = [
     "다른 브랜치를 병합 없이 main에 직접 push",
   ],
   ["block-main-writes.js", bash(`${GP} origin +fix/x:main`), "BLOCK", "강제 push도 동일하게 차단"],
+  ["block-main-writes.js", bash(`GIT.EXE push origin fix/x:main`), "BLOCK", "대문자 실행 파일 이름의 refspec push (재리뷰 권고 5)"],
   ["block-main-writes.js", bash(`${GP} origin "fix/x:main"`), "BLOCK", "인용부호로 감싼 refspec"],
   ["block-main-writes.js", bash(`${GP} origin main`), "ALLOW", "같은 브랜치의 평범한 push"],
   ["block-main-writes.js", bash(`${GP} origin main:main`), "ALLOW", "명시적 main:main도 평범한 push"],

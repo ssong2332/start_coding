@@ -22,6 +22,8 @@ place(".claude/worktrees/sample-wt/scripts/init.sh");
 place(".claude/notes.md");
 place("src/worktrees/notes.md");
 place(".artifacts/handoff/KIT-AUDIT/S9/report.md");
+place("src/.artifacts/notes.md");
+place("src/docs/notes.md");
 
 function c5Lines() {
   const r = spawnSync(process.execPath, [SCRIPT, "--report"], { cwd: fixtureRoot, encoding: "utf8" });
@@ -35,7 +37,7 @@ test("C5: .claude/worktrees/ 아래 워크트리 사본은 검사하지 않는�
 });
 
 test("C5: .artifacts/ 아래 증거·핸드오프 파일은 검사하지 않는다", () => {
-  const hits = c5Lines().filter((l) => l.includes(".artifacts/"));
+  const hits = c5Lines().filter((l) => l.startsWith("C5 .artifacts/"));
   assert.deepEqual(hits, []);
 });
 
@@ -45,4 +47,13 @@ test("C5: 워크트리가 아닌 .claude/ 파일의 플레이스홀더는 계속
 
 test("C5: .claude 밖의 worktrees 이름 폴더는 제외하지 않는다", () => {
   assert.ok(c5Lines().some((l) => l.startsWith("C5 src/worktrees/notes.md:")));
+});
+
+// 루트의 docs/·.artifacts/만 제외 대상이다 — 같은 이름의 하위 폴더까지 건너뛰면 검사가 빠진다(2026-10-27 재리뷰 권고 4)
+test("C5: 루트가 아닌 .artifacts 이름 폴더는 제외하지 않는다", () => {
+  assert.ok(c5Lines().some((l) => l.startsWith("C5 src/.artifacts/notes.md:")));
+});
+
+test("C5: 루트가 아닌 docs 이름 폴더는 제외하지 않는다", () => {
+  assert.ok(c5Lines().some((l) => l.startsWith("C5 src/docs/notes.md:")));
 });
