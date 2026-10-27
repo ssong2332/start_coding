@@ -62,7 +62,7 @@ bash scripts/init.sh "프로젝트명"
 
 기술 스택을 정하기 전에 런타임·버전, 설치 허용 범위, 테스트 실행 수단, 실제 화면 확인 도구를 읽기 전용으로 확인한다. 확인한 환경 제약은 [Architecture의 사전 확인 표](docs/Architecture.md#실행환경-사전-확인-기술-선택-전)에 기록한다. 기획에서는 승인 기준과 화면 상태를 담당 작업에 배정해 후속 기능 때문에 선행 작업의 완료가 막히지 않도록 한다.
 
-구현·검증에서는 Red·Green·회귀 실행의 전체 출력과 종료 코드를 작업별 `.artifacts/verification/`에 보존한다. 이 경로는 Git 추적에서 제외된다. 실제 화면 확인은 현재 도구의 가용성과 실패 결과에 따라 담당·미검증 범위를 기록한다. 화면 확인은 사용자가 보는 Browser pane에서 하고 마지막 화면을 남기며, 리뷰·QA 통과 뒤 메인 세션이 사용자 확인을 받아야 완료로 전환한다(웹 UI 프로젝트의 T-01에는 `.claude/launch.json` dev 서버 설정 포함, [AGENTS.md "사용자 화면 확인"](AGENTS.md#검증-루프-테스트-우선)). 공통 판정은 [AGENTS.md](AGENTS.md#검증-증거-보존)와 [DefinitionOfDone.md](docs/DefinitionOfDone.md)를 따르고, Codex의 세션 출력 수집 방법은 [.codex/EXECUTION.md](.codex/EXECUTION.md)를 참조한다. 자동 로그 수집 프로그램은 제공하지 않는다. 이전의 `scripts/pipeline.ps1`·`scripts/orchestrator.ps1`·`.agents/role-map.yaml` 자동 오케스트레이션은 제거되었다.
+구현·검증에서는 Red·Green·회귀 실행의 전체 출력과 종료 코드를 작업별 `.artifacts/verification/`에 보존한다. 이 경로는 Git 추적에서 제외된다. 실제 화면 확인은 현재 도구의 가용성과 실패 결과에 따라 담당·미검증 범위를 기록한다. 화면 확인은 사용자가 보는 Browser pane에서 하고 마지막 화면을 남기며, 리뷰·QA 통과 뒤 메인 세션이 사용자 확인을 받아야 완료로 전환한다(웹 UI 프로젝트의 T-01에는 `.claude/launch.json` dev 서버 설정 포함, [AGENTS.md "사용자 화면 확인"](AGENTS.md#검증-루프-테스트-우선)). 웹 UI의 PRD 핵심 사용자 흐름은 E2E 회귀 테스트를 Red-First로 두며(T-01에 E2E 러너 설정과 스모크 1개 포함) 실물 확인과 서로 대신하지 않는다([AGENTS.md "화면 흐름 회귀"](AGENTS.md#검증-루프-테스트-우선)). 공통 판정은 [AGENTS.md](AGENTS.md#검증-증거-보존)와 [DefinitionOfDone.md](docs/DefinitionOfDone.md)를 따르고, Codex의 세션 출력 수집 방법은 [.codex/EXECUTION.md](.codex/EXECUTION.md)를 참조한다. 자동 로그 수집 프로그램은 제공하지 않는다. 이전의 `scripts/pipeline.ps1`·`scripts/orchestrator.ps1`·`.agents/role-map.yaml` 자동 오케스트레이션은 제거되었다.
 
 ## 이 킷 자체의 문제를 발견하면
 
