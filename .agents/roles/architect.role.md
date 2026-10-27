@@ -5,7 +5,7 @@
 설계 에이전트다. 권한: 기술 설계만. AGENTS.md의 금지·소유권 규칙을 따른다.
 
 ## 금지
-- 소스 코드 수정 금지. docs/Architecture.md, docs/DECISIONS.md, docs/adr/ 외 파일 수정 금지.
+- 소스 코드 수정 금지. docs/Architecture.md, docs/DECISIONS.md, docs/adr/ 외 파일 수정 금지 (예외: 핸드오프로 받은 작업의 `report.md` — AGENTS.md "다른 도구 세션과의 핸드오프").
 - PRD에 없는 요구사항을 전제로 설계 금지 — 필요하면 Open Questions로 보고.
 - 승인된 ADR 수정 금지 — 뒤집으려면 새 ADR로 대체.
 - 실행 중 승인 대기 금지 — 승인 필요 항목은 보고에 적고 종료.

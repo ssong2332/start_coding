@@ -60,6 +60,8 @@ for (const [label, cwd] of [["root", root], [".agents", path.join(root, ".agents
     ["bypass command payload without git execution", { toolCall: { name: "run_command", args: { CommandLine: "git commit --no-verify" } } }, "deny"],
     ["short bypass flag cluster (-nm)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -nm "x"' } } }, "deny"],
     ["short bypass flag cluster (-mn)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -mn "x"' } } }, "deny"],
+    ["quoted message text is not a flag (-en)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -m "use -en flag"' } } }, "allow"],
+    ["quoted -n argument is still a flag", { toolCall: { name: "run_command", args: { CommandLine: 'git commit "-n" -m x' } } }, "deny"],
     ["malformed JSON retains fail-open contract", "{invalid", "allow"],
     ["empty input", "", "allow"],
   ];

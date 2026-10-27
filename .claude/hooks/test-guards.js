@@ -30,6 +30,8 @@ function verdict(script, payload) {
     encoding: "utf8",
   });
   if (r.status === 2) return "BLOCK";
+  // exit 0이어도 permissionDecision "ask"를 내면 사용자 확인 창이 뜬다 — 허용과 구분한다
+  if (r.status === 0 && /"permissionDecision"\s*:\s*"ask"/.test(r.stdout || "")) return "ASK";
   if (r.status === 0) return "ALLOW";
   return `CRASH(${r.status}): ${(r.stderr || "").split("\n")[0]}`;
 }
@@ -77,6 +79,18 @@ const CASES = [
   ["block-no-verify.js", bash("git log -n 5"), "ALLOW", "commit이 아닌 곳의 -n은 count 옵션"],
   ["block-no-verify.js", bash(`${GC} -m "x"`), "ALLOW", "평범한 커밋"],
   ["block-no-verify.js", bash(`${GC} --amend`), "ALLOW", "amend는 우회가 아니다"],
+  ["block-no-verify.js", bash(`${GC} -m "use -en flag"`), "ALLOW", "메시지 따옴표 안의 -en은 플래그가 아니다 (2026-10-27 리뷰 권고 2)"],
+  ["block-no-verify.js", bash(`${GC} -m 'see -n docs'`), "ALLOW", "작은따옴표 메시지 안의 -n도 텍스트"],
+  ["block-no-verify.js", bash(`echo "${GC} -n"`), "ALLOW", "echo 인자 문자열 안의 커밋 명령은 실행되지 않는다"],
+  ["block-no-verify.js", bash(`${GC} "-n" -m x`), "BLOCK", "따옴표로 감싸도 git은 -n 플래그로 받는다"],
+  ["block-no-verify.js", bash(`git -C repo commit -n -m x`), "BLOCK", "commit 앞의 git 전역 옵션"],
+  ["block-no-verify.js", bash(`cd repo && ${GC} -nm x`), "BLOCK", "연결된 명령 구간 안의 커밋"],
+  // confirm-agy-delegate — 안티그래비티 권한 우회 실행은 매번 사용자 확인 (리뷰 권고 4)
+  ["confirm-agy-delegate.js", bash(`agy --dangerously-skip-permissions -p "Read x/prompt.md"`), "ASK", "권한 우회 위임 실행"],
+  ["confirm-agy-delegate.js", bash(`cd repo && agy.exe --dangerously-skip-permissions -p "x"`), "ASK", "연결 명령·.exe 이름"],
+  ["confirm-agy-delegate.js", bash(`agy --help`), "ALLOW", "권한 우회 플래그 없는 agy"],
+  ["confirm-agy-delegate.js", bash(`echo "agy --dangerously-skip-permissions"`), "ALLOW", "문자열로만 언급"],
+  ["confirm-agy-delegate.js", bash("npm test"), "ALLOW", "무관한 명령"],
   // block-main-writes — 브랜치 무관 케이스
   [
     "block-main-writes.js",

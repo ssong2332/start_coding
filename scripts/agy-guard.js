@@ -16,6 +16,20 @@
  */
 
 const { execSync } = require("child_process");
+const path = require("path");
+
+// git commit -n 계열 검사는 Claude 가드와 같은 인자 단위 함수를 쓴다(드리프트 방지).
+// 모듈을 못 찾으면 가드 전체가 죽어 도구 호출이 막힐 수 있으므로(KitFeedback #6)
+// 예전 정규식으로 대체한다 — 이 대체 경로는 따옴표 안 텍스트를 오탐할 수 있다.
+let findCommitNoVerifyShortFlag;
+try {
+  ({ findCommitNoVerifyShortFlag } = require(path.join(__dirname, "..", ".claude", "hooks", "lib", "shell-args.js")));
+} catch {
+  findCommitNoVerifyShortFlag = (command) => {
+    const m = command.match(/\bcommit\b[^\n]*\s(-[aceCimnopqsSuvF]*n[aceCimnopqsSuvF]*)\b/);
+    return m ? m[1] : null;
+  };
+}
 
 function main() {
   let input = "";
@@ -76,16 +90,18 @@ function main() {
             }
           }
 
-          // 2-2. 훅 우회 플래그 검사 (.claude/hooks/block-no-verify.js 와 동일 패턴 집합)
+          // 2-2. 훅 우회 플래그 검사 (.claude/hooks/block-no-verify.js 와 동일 규칙)
           const skipPatterns = [
             /--no-verify\b/,
             /--no-gpg-sign\b/,
-            /\bcommit\b[^\n]*\s-[aceCimnopqsSuvF]*n[aceCimnopqsSuvF]*\b/, // git commit -n / -nm / -mn (--no-verify 단축형 묶음 포함)
             /-c\s*commit\.gpgsign=false\b/,
             /-c\s*core\.hooksPath=/,
             /\bconfig\b[^\n]*core\.hooksPath\b/, // git config core.hooksPath <경로> (영구 설정)
           ];
-          const skipHit = /\bgit\b/.test(command) && skipPatterns.find((p) => p.test(command));
+          const shortFlag = /\bgit\b/.test(command) && findCommitNoVerifyShortFlag(command);
+          const skipHit = shortFlag
+            ? `git commit ${shortFlag}`
+            : /\bgit\b/.test(command) && skipPatterns.find((p) => p.test(command));
           if (skipHit) {
             output({
               decision: "deny",

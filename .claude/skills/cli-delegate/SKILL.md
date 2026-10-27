@@ -13,6 +13,7 @@ Claude Code 메인 세션 전용 절차다. 핸드오프 파일 위치·보고 �
 
 ## 1. 실행 ID와 폴더
 `.artifacts/handoff/{작업ID}/{실행ID}/` — 실행ID는 `{도구}-{YYYYMMDD-HHMMSS}`. 작업 ID가 없으면 `ADHOC`.
+작업ID·실행ID는 `^[A-Za-z0-9._-]+$`에 맞아야 한다(공백·따옴표·경로 구분자 금지). 맞지 않으면 폴더를 만들거나 실행하지 말고 사용자에게 ID를 다시 정하자고 보고한다 — 이 경로 조각이 아래 명령에 그대로 들어간다.
 
 ## 2. prompt.md 작성 (아래 틀을 빈칸 없이 채운다)
 ```
@@ -34,10 +35,12 @@ Claude Code 메인 세션 전용 절차다. 핸드오프 파일 위치·보고 �
 | Codex로 자동 위임 | 아래 Codex 명령을 백그라운드로 실행 |
 | 안티그래비티로 자동 위임 | 위험도와 명령을 사용자에게 보여주고 확인을 받은 뒤 실행 |
 
+아래 명령은 POSIX 셸 문법(`<`·`>` 리다이렉트)이므로 **Bash 도구(Git Bash)로 실행한다**. PowerShell은 `<` 입력 리다이렉트를 지원하지 않는다(`The '<' operator is reserved for future use.` — 2026-10-27 확인). `{D}`는 리포 루트 기준 상대 경로로 쓰고 cwd는 리포 루트로 둔다.
+
 | 도구 | 명령 (`{D}` = 실행 폴더) | 위험도 | 검증 상태 |
 |---|---|---|---|
 | Codex | `codex exec --approve-for-me -o {D}/last-message.md - < {D}/prompt.md > {D}/stdout.txt 2> {D}/stderr.txt` | 낮음 — workspace-write 샌드박스 내 자동 승인 | `codex exec --approve-for-me`만 실측됨(CodingRules 위임 CLI 표). stdin(`-`)·`-o` 조합은 `codex exec --help`(0.153.4)로 옵션 존재만 확인, 첫 성공 시 CodingRules에 등록 |
-| 안티그래비티 | `agy --dangerously-skip-permissions -p "Read {D}/prompt.md and follow it exactly." > {D}/stdout.txt 2> {D}/stderr.txt` | 높음 — 전체 권한 우회 | 원 명령은 실측됨(`-p`가 마지막이어야 함). 인자에는 파일 경로가 담긴 고정 문장만 넣는다 |
+| 안티그래비티 | `agy --dangerously-skip-permissions -p "Read {D}/prompt.md and follow it exactly." > {D}/stdout.txt 2> {D}/stderr.txt` | 높음 — 전체 권한 우회. `.claude/hooks/confirm-agy-delegate.js`가 실행마다 사용자 확인 창을 강제한다 | 원 명령은 실측됨(`-p`가 마지막이어야 함). 인자에는 파일 경로가 담긴 고정 문장만 넣는다 |
 
 실행 후 `{D}/meta.json`에 실행 주체·시각·cwd·명령 원문·종료 코드를 기록한다(AGENTS.md 검증 증거 보존과 같은 항목).
 
