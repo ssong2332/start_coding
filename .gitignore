@@ -29,3 +29,8 @@ venv/
 .env.*
 !.env.example
 *.local
+
+# 로컬 검증 증거 (커밋 대상 아님)
+.artifacts/verification/
+# 다른 도구 세션과의 핸드오프 파일 (AGENTS.md "다른 도구 세션과의 핸드오프")
+.artifacts/handoff/

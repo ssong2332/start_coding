@@ -1,7 +1,8 @@
 /**
  * Antigravity PreToolUse 가드 — .claude/hooks/ 의 안티그래비티 대응물.
- * 배선은 .agents/hooks.json: `node scripts/agy-guard.js` (cwd=워크스페이스 루트 전제).
- * 전제가 어긋나면 훅이 조용히 무동작한다 — 확인법은 .claude/hooks/README.md 참조.
+ * 배선은 .agents/hooks.json: `node scripts/agy-guard.js`.
+ * 루트에서는 본체, .agents에서는 프로젝트 루트로 이동하는 얇은 진입점을 실행한다.
+ * 진입점 모듈이 없으면 도구 실행이 차단될 수 있다 — 확인법은 .claude/hooks/README.md 참조.
  *
  * 강제하는 규칙 (원본은 문서, 여기는 물리 차단 계층). .claude/hooks/의 3개
  * 가드(block-main-writes·block-no-verify·block-env-access)와 규칙을 공유하므로
@@ -15,6 +16,20 @@
  */
 
 const { execSync } = require("child_process");
+const path = require("path");
+
+// git commit -n 계열 검사는 Claude 가드와 같은 인자 단위 함수를 쓴다(드리프트 방지).
+// 모듈을 못 찾으면 가드 전체가 죽어 도구 호출이 막힐 수 있으므로(KitFeedback #6)
+// 예전 정규식으로 대체한다 — 이 대체 경로는 따옴표 안 텍스트를 오탐할 수 있다.
+let findCommitNoVerifyShortFlag;
+try {
+  ({ findCommitNoVerifyShortFlag } = require(path.join(__dirname, "..", ".claude", "hooks", "lib", "shell-args.js")));
+} catch {
+  findCommitNoVerifyShortFlag = (command) => {
+    const m = command.match(/\bcommit\b[^\n]*\s(-[aceCimnopqsSuvF]*n[aceCimnopqsSuvF]*)\b/);
+    return m ? m[1] : null;
+  };
+}
 
 function main() {
   let input = "";
@@ -43,7 +58,7 @@ function main() {
       };
 
       // 1. 파일 도구에서 .env 접근 검사
-      const targetPaths = [args.AbsolutePath, args.TargetFile, args.SearchPath, args.DirectoryPath].filter(Boolean);
+      const targetPaths = [args.Path, args.AbsolutePath, args.TargetFile, args.SearchPath, args.DirectoryPath].filter(Boolean);
       for (const p of targetPaths) {
         if (isEnvPath(p)) {
           output({
@@ -75,16 +90,18 @@ function main() {
             }
           }
 
-          // 2-2. 훅 우회 플래그 검사 (.claude/hooks/block-no-verify.js 와 동일 패턴 집합)
+          // 2-2. 훅 우회 플래그 검사 (.claude/hooks/block-no-verify.js 와 동일 규칙)
           const skipPatterns = [
             /--no-verify\b/,
             /--no-gpg-sign\b/,
-            /\bcommit\b[^\n]*\s-n\b/, // git commit -n (--no-verify 단축형)
             /-c\s*commit\.gpgsign=false\b/,
             /-c\s*core\.hooksPath=/,
             /\bconfig\b[^\n]*core\.hooksPath\b/, // git config core.hooksPath <경로> (영구 설정)
           ];
-          const skipHit = /\bgit\b/.test(command) && skipPatterns.find((p) => p.test(command));
+          const shortFlag = /\bgit\b/.test(command) && findCommitNoVerifyShortFlag(command);
+          const skipHit = shortFlag
+            ? `git commit ${shortFlag}`
+            : /\bgit\b/.test(command) && skipPatterns.find((p) => p.test(command));
           if (skipHit) {
             output({
               decision: "deny",

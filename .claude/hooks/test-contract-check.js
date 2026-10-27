@@ -1,0 +1,48 @@
+// contract-check.js 회귀 검사. 단독 실행: node --test .claude/hooks/test-contract-check.js
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+const { spawnSync } = require("node:child_process");
+const { test, after } = require("node:test");
+
+const SCRIPT = path.join(__dirname, "contract-check.js");
+// 임시 fixture는 보존 증거가 아니다 — .artifacts/verification/ 밖에 만들고 이 실행이 끝나면 지운다.
+const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "contract-check-"));
+after(() => fs.rmSync(fixtureRoot, { recursive: true, force: true }));
+
+const PLACEHOLDER = "# {{PROJECT_NAME}}\n";
+function place(rel) {
+  const full = path.join(fixtureRoot, rel);
+  fs.mkdirSync(path.dirname(full), { recursive: true });
+  fs.writeFileSync(full, PLACEHOLDER);
+}
+place(".claude/worktrees/sample-wt/README.md");
+place(".claude/worktrees/sample-wt/scripts/init.sh");
+place(".claude/notes.md");
+place("src/worktrees/notes.md");
+place(".artifacts/handoff/KIT-AUDIT/S9/report.md");
+
+function c5Lines() {
+  const r = spawnSync(process.execPath, [SCRIPT, "--report"], { cwd: fixtureRoot, encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr);
+  return r.stdout.split("\n").filter((l) => l.startsWith("C5 "));
+}
+
+test("C5: .claude/worktrees/ 아래 워크트리 사본은 검사하지 않는다", () => {
+  const hits = c5Lines().filter((l) => l.includes(".claude/worktrees/"));
+  assert.deepEqual(hits, []);
+});
+
+test("C5: .artifacts/ 아래 증거·핸드오프 파일은 검사하지 않는다", () => {
+  const hits = c5Lines().filter((l) => l.includes(".artifacts/"));
+  assert.deepEqual(hits, []);
+});
+
+test("C5: 워크트리가 아닌 .claude/ 파일의 플레이스홀더는 계속 잡는다", () => {
+  assert.ok(c5Lines().some((l) => l.startsWith("C5 .claude/notes.md:")));
+});
+
+test("C5: .claude 밖의 worktrees 이름 폴더는 제외하지 않는다", () => {
+  assert.ok(c5Lines().some((l) => l.startsWith("C5 src/worktrees/notes.md:")));
+});

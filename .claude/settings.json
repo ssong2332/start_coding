@@ -6,7 +6,8 @@
         "hooks": [
           { "type": "command", "command": "node .claude/hooks/block-main-writes.js" },
           { "type": "command", "command": "node .claude/hooks/block-no-verify.js" },
-          { "type": "command", "command": "node .claude/hooks/block-env-access.js" }
+          { "type": "command", "command": "node .claude/hooks/block-env-access.js" },
+          { "type": "command", "command": "node .claude/hooks/confirm-agy-delegate.js" }
         ]
       },
       {
