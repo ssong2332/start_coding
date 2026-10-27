@@ -151,7 +151,8 @@ function checkOwnership(findings) {
 // (scripts/init.* 의 치환 대상은 README.md 와 docs/**.md 뿐이다.
 //  그 밖의 파일에 {{...}} 를 두면 새 프로젝트에서 영원히 치환되지 않는다.)
 function checkPlaceholders(findings) {
-  const SKIP = new Set([".git", "node_modules", "docs", ".vscode"]);
+  // .artifacts 는 Git 제외 증거·핸드오프 보관소라 init 치환 대상이 아니다
+  const SKIP = new Set([".git", "node_modules", "docs", ".vscode", ".artifacts"]);
   const PATTERN = /\{\{[A-Z0-9_]+\}\}/;
   const walk = (dir) => {
     let entries = [];

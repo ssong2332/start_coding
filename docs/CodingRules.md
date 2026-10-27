@@ -52,4 +52,5 @@
 | 용도 | 명령 (원문) | 검증일 |
 |---|---|---|
 | Codex 비대화형 위임 (workspace-write 자동 승인) | `codex exec --approve-for-me` | 2026-09-08 (role-map 기록에서 인용) |
+| Codex 위임 — prompt.md를 stdin으로, 마지막 메시지를 파일로 (Git Bash에서 실행. `-m`은 그 실행 환경의 기본 모델이 미지원이라 사용자 지시로 붙인 것) | `codex exec --approve-for-me -m gpt-6-astra -o {D}/last-message.md - < {D}/prompt.md > {D}/stdout.txt 2> {D}/stderr.txt` | 2026-10-27 (KIT-AUDIT S1 블라인드 재채점, 종료 코드 0) |
 | 안티그래비티 비대화형 위임 (전체 권한 우회 — 실행마다 사용자 확인, `-p`는 항상 마지막) | `agy --dangerously-skip-permissions -p` | 2026-09-09 (role-map 기록에서 인용) |

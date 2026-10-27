@@ -12,6 +12,6 @@
 ## 규칙
 
 - 행 추가는 docs만 한다. docs는 과거 행을 다시 쓰거나 지우지 않는다.
-- 상태 열만 예외다: 행에 이름 오른 담당 에이전트(planner/architect)가 처리한 뒤 `open` → `resolved`로 바꿀 수 있다 — implementer가 docs/Tasks.md의 자기 작업 Status 열만 바꿀 수 있는 것과 같은 구조(AGENTS.md 문서 소유권).
+- 상태 열만 예외다: 행에 이름 오른 담당 에이전트(planner/architect)가 처리한 뒤 `open` → `resolved`로 바꿀 수 있다(AGENTS.md 문서 소유권 표의 docs/UpdateRequests.md 행).
 - 그 외는 전부 읽기 전용이다.
 - 같은 문서·같은 절에 이미 열린(`open`) 행이 있으면 중복 행을 만들지 않는다 — 처리를 기다리는 요청이 이미 있다는 뜻이다.

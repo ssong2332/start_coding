@@ -21,6 +21,7 @@ place(".claude/worktrees/sample-wt/README.md");
 place(".claude/worktrees/sample-wt/scripts/init.sh");
 place(".claude/notes.md");
 place("src/worktrees/notes.md");
+place(".artifacts/handoff/KIT-AUDIT/S9/report.md");
 
 function c5Lines() {
   const r = spawnSync(process.execPath, [SCRIPT, "--report"], { cwd: fixtureRoot, encoding: "utf8" });
@@ -30,6 +31,11 @@ function c5Lines() {
 
 test("C5: .claude/worktrees/ 아래 워크트리 사본은 검사하지 않는다", () => {
   const hits = c5Lines().filter((l) => l.includes(".claude/worktrees/"));
+  assert.deepEqual(hits, []);
+});
+
+test("C5: .artifacts/ 아래 증거·핸드오프 파일은 검사하지 않는다", () => {
+  const hits = c5Lines().filter((l) => l.includes(".artifacts/"));
   assert.deepEqual(hits, []);
 });
 

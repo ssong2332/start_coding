@@ -39,7 +39,7 @@ Claude Code 메인 세션 전용 절차다. 핸드오프 파일 위치·보고 �
 
 | 도구 | 명령 (`{D}` = 실행 폴더) | 위험도 | 검증 상태 |
 |---|---|---|---|
-| Codex | `codex exec --approve-for-me -o {D}/last-message.md - < {D}/prompt.md > {D}/stdout.txt 2> {D}/stderr.txt` | 낮음 — workspace-write 샌드박스 내 자동 승인 | `codex exec --approve-for-me`만 실측됨(CodingRules 위임 CLI 표). stdin(`-`)·`-o` 조합은 `codex exec --help`(0.153.4)로 옵션 존재만 확인, 첫 성공 시 CodingRules에 등록 |
+| Codex | `codex exec --approve-for-me -o {D}/last-message.md - < {D}/prompt.md > {D}/stdout.txt 2> {D}/stderr.txt` | 낮음 — workspace-write 샌드박스 내 자동 승인 | stdin(`-`)·`-o` 조합 실측됨 — 2026-10-27, `-m` 모델 지정을 더한 원문이 CodingRules 위임 CLI 표에 있다. 모델 지정이 필요한지는 실행 환경의 Codex 기본 모델에 따른다 |
 | 안티그래비티 | `agy --dangerously-skip-permissions -p "Read {D}/prompt.md and follow it exactly." > {D}/stdout.txt 2> {D}/stderr.txt` | 높음 — 전체 권한 우회. `.claude/hooks/confirm-agy-delegate.js`가 실행마다 사용자 확인 창을 강제한다 | 원 명령은 실측됨(`-p`가 마지막이어야 함). 인자에는 파일 경로가 담긴 고정 문장만 넣는다 |
 
 실행 후 `{D}/meta.json`에 실행 주체·시각·cwd·명령 원문·종료 코드를 기록한다(AGENTS.md 검증 증거 보존과 같은 항목).

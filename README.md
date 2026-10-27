@@ -18,7 +18,7 @@ bash scripts/init.sh "프로젝트명"
 ```
 
 3. **Codex를 쓸 계획이면 먼저 `/hooks`로 훅 정의를 신뢰 승인한다** — 승인 전에는 main 직접 커밋·`.env` 접근 차단이 조용히 무동작한다. 안티그래비티 훅은 루트와 `.agents` cwd용 진입점을 사용한다. 실제 앱 연결은 `git status` 같은 읽기 명령으로 재확인한다. 실제 `.env` 파일을 열어 시험하지 않는다.
-4. 아이디어를 도구(Claude Code·Codex·안티그래비티 아무거나)에 말한다 → **대화형 인터뷰**로 명세를 완성한 뒤 `docs/PRD.md`가 작성된다 (파이프라인 0~1단계)
+4. 아이디어를 **Claude Code 메인 세션**에 말한다 → 메인 세션이 **대화형 인터뷰**로 명세를 완성한 뒤 `docs/PRD.md`가 작성된다 (파이프라인 0~1단계). Codex·안티그래비티는 인터뷰를 시작하지 않는다 ([AGENTS.md "메인 오케스트레이터" 문단](AGENTS.md#개발-파이프라인) 참조)
 5. Claude Code / Codex / 안티그래비티 어느 도구로 열어도 같은 규칙(AGENTS.md)이 적용된다. **메인 오케스트레이터는 Claude Code 세션**이고, Codex·안티그래비티는 같은 폴더에서 작업 하나를 맡는 실행자다 — Claude가 CLI로 위임하거나, 사용자가 같은 폴더를 해당 도구로 열어 직접 지시한다. 절차는 [AGENTS.md의 핸드오프 절](AGENTS.md#다른-도구-세션과의-핸드오프)과 `.claude/skills/cli-delegate/SKILL.md`.
 
 | 도구 | 규칙 읽는 방식 | 강제 계층 활성 조건 |
@@ -44,7 +44,7 @@ bash scripts/init.sh "프로젝트명"
 ├── .agents/scripts/   # .agents cwd에서 기존 안티그래비티 가드를 호출하는 진입점
 ├── .claude/agents/    # 6-에이전트 연결 파일 (도구 권한·모델만 정의, 본문은 .agents/roles/)
 ├── .claude/skills/    # Claude Code의 공용 스킬 연결 파일 + 전용 스킬 cli-delegate(Codex·안티그래비티 위임)
-├── .claude/hooks/     # 강제 가드 3종 + 정합성 검사 (Claude Code·Codex 공유)
+├── .claude/hooks/     # 강제 가드 3종 + 안티그래비티 위임 확인 훅(confirm-agy-delegate.js, Claude Code 전용) + 정합성 검사 (가드는 Claude Code·Codex 공유)
 ├── .codex/agents/     # 6-에이전트 연결 파일 (Codex 전용, 본문은 .agents/roles/)
 ├── .codex/EXECUTION.md # Codex 실행 출력·세션 수집 안내
 ├── .codex/DEVELOPMENT.md·FRONTEND.md # Codex 개발 보조·UI 구현 지침
@@ -56,7 +56,7 @@ bash scripts/init.sh "프로젝트명"
 
 ## 개발 파이프라인
 
-아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조.
+아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조. 각 단계를 메인 세션과 서브에이전트 중 누가 수행하는지는 [AGENTS.md의 "메인 세션과 서브에이전트 구분" 절](AGENTS.md#메인-세션과-서브에이전트-구분)을 따른다.
 
 인터뷰는 아이디어를 받아 적는 단계가 아니라 **같이 설계하는 대화**다: 개인/팀·언어·배포·기능 범위 등 빈칸을 질문으로 채우고, 선택지마다 추천 방향과 반대 방향을 함께 제시하며, 사용자가 "완성"을 선언할 때까지 계속된다. 절차는 [.agents/skills/idea-interview/SKILL.md](.agents/skills/idea-interview/SKILL.md).
 

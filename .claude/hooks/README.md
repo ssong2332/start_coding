@@ -37,6 +37,7 @@
 | `block-main-writes.js` | 가드 | main/master 체크아웃 상태의 `git commit`, 다른 브랜치를 main에 직접 써넣는 refspec push |
 | `block-no-verify.js` | 가드 | `--no-verify`, `--no-gpg-sign`, 훅 우회 config |
 | `block-env-access.js` | 가드 | 실제 `.env` 읽기·수정·출력·덮어쓰기 (`.env.example`은 허용) |
+| `confirm-agy-delegate.js` | 확인 훅 | 차단하지 않는다. `agy … --dangerously-skip-permissions` 실행이면 `permissionDecision: "ask"`로 매번 사용자 확인 창을 띄운다 (Claude Code에만 배선) |
 | `contract-check.js` | 노티파이어 | 규칙 문서 간 모순 7종(C1~C7) 검사 결과를 알림 (Claude Code에서만 자동 실행) |
 
 `block-env-access.js`는 Codex의 `apply_patch`도 처리한다 — 그 도구는 파일 경로가 아니라 **패치 본문**을 `tool_input.command`에 담으므로 `*** Add/Update/Delete File:` 줄에서 대상 경로를 파싱한다.
@@ -58,7 +59,7 @@ node .claude/hooks/contract-check.js --report
 node .claude/hooks/test-guards.js
 ```
 
-`test-guards.js`는 가드 3종(block-main-writes·block-no-verify·block-env-access)의 회귀 테스트다. 아무 훅 이벤트에도 걸려 있지 않다 — 가드 패턴을 고칠 때마다 손으로 돈다. `.claude/hooks/package.json`(프로젝트 루트 `package.json`과는 별개, Node 버전만 명시)에 `npm --prefix .claude/hooks test`로도 같은 걸 실행할 수 있게 등록돼 있다.
+`test-guards.js`는 가드 3종(block-main-writes·block-no-verify·block-env-access)과 확인 훅(confirm-agy-delegate)의 회귀 테스트다. 아무 훅 이벤트에도 걸려 있지 않다 — 가드 패턴을 고칠 때마다 손으로 돈다. `.claude/hooks/package.json`(프로젝트 루트 `package.json`과는 별개, Node 버전만 명시)에 `npm --prefix .claude/hooks test`로도 같은 걸 실행할 수 있게 등록돼 있다.
 
 ## 검사 항목 (contract-check)
 

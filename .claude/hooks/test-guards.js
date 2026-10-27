@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PreToolUse 가드 3종의 회귀 테스트. 어떤 훅 이벤트에도 안 걸려 있다 —
+// PreToolUse 가드 3종과 확인 훅(confirm-agy-delegate)의 회귀 테스트. 어떤 훅 이벤트에도 안 걸려 있다 —
 // 가드 패턴을 고친 뒤 손으로 돌린다:
 //
 //   node .claude/hooks/test-guards.js
