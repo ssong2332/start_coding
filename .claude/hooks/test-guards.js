@@ -25,7 +25,7 @@ const GC = "git" + " " + "commit";
 const GP = "git" + " " + "push";
 
 function verdict(script, payload) {
-  const r = spawnSync(process.execPath, [path.join(__dirname, script)], {
+  const r = spawnSync(process.execPath, [path.resolve(__dirname, script)], {
     input: JSON.stringify(payload),
     encoding: "utf8",
   });
@@ -135,12 +135,32 @@ const CASES = [
   ],
 ];
 
+// 공용 모듈(lib/shell-args.js)이 없을 때도 block-no-verify가 죽지 않고 차단해야 한다 —
+// 죽으면 exit 1이라 우회 플래그가 전부 통과한다(2026-10-27 재리뷰 권고 1).
+// 임시 fixture는 OS 임시 폴더에 만들고 이 실행이 끝나면 지운다.
+const fs = require("fs");
+const os = require("os");
+const noLibDir = fs.mkdtempSync(path.join(os.tmpdir(), "guard-nolib-"));
+fs.mkdirSync(path.join(noLibDir, "lib"));
+fs.copyFileSync(path.join(__dirname, "block-no-verify.js"), path.join(noLibDir, "block-no-verify.js"));
+fs.copyFileSync(path.join(__dirname, "lib", "read-hook-input.js"), path.join(noLibDir, "lib", "read-hook-input.js"));
+const noLib = path.join(noLibDir, "block-no-verify.js");
+CASES.push(
+  [noLib, bash(`${GC} --no-` + "verify"), "BLOCK", "[모듈 없음] 긴 플래그는 정규식 목록으로 차단"],
+  [noLib, bash(`${GC} -` + `nm "x"`), "BLOCK", "[모듈 없음] 짧은 플래그는 대체 정규식으로 차단"],
+  [noLib, bash("git status"), "ALLOW", "[모듈 없음] 대체 경로가 정상 명령을 막지 않음"]
+);
+
 let failed = 0;
+try {
 for (const [script, payload, expected, why] of CASES) {
   const actual = verdict(script, payload);
   const ok = actual === expected;
   if (!ok) failed++;
-  console.log(`${ok ? "  ok  " : " FAIL "} ${script.padEnd(22)} ${why.padEnd(58)} expected=${expected} actual=${actual}`);
+  console.log(`${ok ? "  ok  " : " FAIL "} ${path.basename(script).padEnd(22)} ${why.padEnd(58)} expected=${expected} actual=${actual}`);
+}
+} finally {
+  fs.rmSync(noLibDir, { recursive: true, force: true });
 }
 
 console.log(`\n${CASES.length - failed}/${CASES.length} 통과`);

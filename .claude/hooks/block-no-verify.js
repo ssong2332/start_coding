@@ -2,7 +2,18 @@
 // PreToolUse 가드 (Bash): 훅·서명을 우회하는 git 플래그를 차단한다.
 // docs/GitWorkflow.md 금지 조항("--no-verify 등 훅 우회 금지")을 강제한다.
 const { readHookInput } = require("./lib/read-hook-input");
-const { findCommitNoVerifyShortFlag } = require("./lib/shell-args");
+// 공용 모듈을 못 찾으면 훅이 exit 1로 죽어 우회 플래그가 전부 통과한다(2026-10-27 재리뷰 권고 1).
+// scripts/agy-guard.js와 같이 예전 정규식으로 대체한다 — 이 대체 경로는 bash -c 문자열 등은 잡지만
+// 따옴표로 감싼 "-n" 인자는 놓친다.
+let findCommitNoVerifyShortFlag;
+try {
+  ({ findCommitNoVerifyShortFlag } = require("./lib/shell-args"));
+} catch {
+  findCommitNoVerifyShortFlag = (command) => {
+    const m = command.match(/\bcommit\b[^\n]*\s(-[aceCimnopqsSuvF]*n[aceCimnopqsSuvF]*)\b/);
+    return m ? m[1] : null;
+  };
+}
 
 readHookInput((payload) => {
   const command = payload?.tool_input?.command;
