@@ -56,13 +56,13 @@ bash scripts/init.sh "프로젝트명"
 
 ## 개발 파이프라인
 
-아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조. 각 단계를 메인 세션과 서브에이전트 중 누가 수행하는지는 [AGENTS.md의 "메인 세션과 서브에이전트 구분" 절](AGENTS.md#메인-세션과-서브에이전트-구분)을 따른다.
+아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조. 각 단계를 메인 세션과 서브에이전트 중 누가 수행하는지는 [AGENTS.md의 "메인 세션과 서브에이전트 구분" 절](AGENTS.md#메인-세션과-서브에이전트-구분)을 따른다. 별도 세션이 필요한 작업은 앱 서브 세션(생성·보고·검증·제공·정리, 정리는 보관이 기본)으로 맡기며 규칙은 같은 절의 "앱 서브 세션" 하위 절에 있다.
 
 인터뷰는 아이디어를 받아 적는 단계가 아니라 **같이 설계하는 대화**다: 개인/팀·언어·배포·기능 범위 등 빈칸을 질문으로 채우고, 선택지마다 추천 방향과 반대 방향을 함께 제시하며, 사용자가 "완성"을 선언할 때까지 계속된다. 절차는 [.agents/skills/idea-interview/SKILL.md](.agents/skills/idea-interview/SKILL.md).
 
 기술 스택을 정하기 전에 런타임·버전, 설치 허용 범위, 테스트 실행 수단, 실제 화면 확인 도구를 읽기 전용으로 확인한다. 확인한 환경 제약은 [Architecture의 사전 확인 표](docs/Architecture.md#실행환경-사전-확인-기술-선택-전)에 기록한다. 기획에서는 승인 기준과 화면 상태를 담당 작업에 배정해 후속 기능 때문에 선행 작업의 완료가 막히지 않도록 한다.
 
-구현·검증에서는 Red·Green·회귀 실행의 전체 출력과 종료 코드를 작업별 `.artifacts/verification/`에 보존한다. 이 경로는 Git 추적에서 제외된다. 실제 화면 확인은 현재 도구의 가용성과 실패 결과에 따라 담당·미검증 범위를 기록한다. 공통 판정은 [AGENTS.md](AGENTS.md#검증-증거-보존)와 [DefinitionOfDone.md](docs/DefinitionOfDone.md)를 따르고, Codex의 세션 출력 수집 방법은 [.codex/EXECUTION.md](.codex/EXECUTION.md)를 참조한다. 자동 로그 수집 프로그램은 제공하지 않는다. 이전의 `scripts/pipeline.ps1`·`scripts/orchestrator.ps1`·`.agents/role-map.yaml` 자동 오케스트레이션은 제거되었다.
+구현·검증에서는 Red·Green·회귀 실행의 전체 출력과 종료 코드를 작업별 `.artifacts/verification/`에 보존한다. 이 경로는 Git 추적에서 제외된다. 실제 화면 확인은 현재 도구의 가용성과 실패 결과에 따라 담당·미검증 범위를 기록한다. 화면 확인은 사용자가 보는 Browser pane에서 하고 마지막 화면을 남기며, 리뷰·QA 통과 뒤 메인 세션이 사용자 확인을 받아야 완료로 전환한다(웹 UI 프로젝트의 T-01에는 `.claude/launch.json` dev 서버 설정 포함, [AGENTS.md "사용자 화면 확인"](AGENTS.md#검증-루프-테스트-우선)). 공통 판정은 [AGENTS.md](AGENTS.md#검증-증거-보존)와 [DefinitionOfDone.md](docs/DefinitionOfDone.md)를 따르고, Codex의 세션 출력 수집 방법은 [.codex/EXECUTION.md](.codex/EXECUTION.md)를 참조한다. 자동 로그 수집 프로그램은 제공하지 않는다. 이전의 `scripts/pipeline.ps1`·`scripts/orchestrator.ps1`·`.agents/role-map.yaml` 자동 오케스트레이션은 제거되었다.
 
 ## 이 킷 자체의 문제를 발견하면
 
