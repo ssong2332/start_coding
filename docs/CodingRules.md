@@ -8,7 +8,7 @@
 - 요청 범위 밖 파일 수정 금지.
 - 주석으로 변경 이력·자기 설명 남기기 금지 (코드가 못 보여주는 제약만 주석으로).
 - 테스트 없이 "동작 확인됨" 보고 금지.
-- **코드 교체 시 주변 변수/문맥 소실 금지**: `replace_file_content` 사용 시 교체 범위(`StartLine`~`EndLine`)를 변경 대상 전후 1~2줄 이내로 외과적으로 한정하며, 상하위 필수 변수 선언문이나 import문이 함께 삭제되지 않도록 반드시 확인한다.
+- **코드 교체 시 주변 변수/문맥 소실 금지**: `edit_file`(`Target`/`Replacement`) 또는 `replace_file_content`(`StartLine`~`EndLine`) 사용 시 교체 범위를 변경 대상 전후 1~2줄 이내로 외과적으로 한정하며, 상하위 필수 변수 선언문이나 import문이 함께 삭제되지 않도록 반드시 확인한다.
 - **CSS `!important` 남용 및 무분별한 트랜지션 덮어쓰기 금지**: 기존 `transition`이 적용된 속성(`transform`, `opacity` 등)을 리셋할 때는 단일 속성 강제 주입 대신 상태 클래스(`.is-settled`) 분리 또는 `transition: none` 사전 지정을 필수로 한다.
 - **`setTimeout` 다중 체이닝을 통한 UI 시퀀스 제어 금지**: 레이스 컨디션 및 유저 클릭 중복 방지를 위해 Web Animations API(`animation.finished`)나 `transitionend` Promise, 혹은 유한 상태 기계(FSM)로 상태 전이를 제어한다.
 
@@ -42,3 +42,14 @@
 | 용도 | 명령 (원문) | 검증일 |
 |---|---|---|
 | 안티그래비티 훅 회귀 검사 (cwd·Stop 시간 예산) | `node --test scripts/test-agy-hook-cwd.js` | 2026-10-02 |
+| 정합성 검사 회귀 (contract-check C5 워크트리 제외) | `node --test .claude/hooks/test-contract-check.js` | 2026-10-27 |
+| Codex 연결 파일·훅 배선 검사 | `node --test .codex/tests/adapters.test.cjs` | 2026-10-27 |
+
+### 위임 CLI 명령 (킷 자체, `.claude/skills/cli-delegate` 참조)
+
+삭제된 `.agents/role-map.yaml`에 기록돼 있던 실측 명령을 옮겼다. 프롬프트 본문은 인자가 아니라 stdin·파일 경로로 전달한다.
+
+| 용도 | 명령 (원문) | 검증일 |
+|---|---|---|
+| Codex 비대화형 위임 (workspace-write 자동 승인) | `codex exec --approve-for-me` | 2026-09-08 (role-map 기록에서 인용) |
+| 안티그래비티 비대화형 위임 (전체 권한 우회 — 실행마다 사용자 확인, `-p`는 항상 마지막) | `agy --dangerously-skip-permissions -p` | 2026-09-09 (role-map 기록에서 인용) |

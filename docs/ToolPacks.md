@@ -7,7 +7,7 @@
 - 전부 설치 금지 — MCP는 도구 정의만으로 컨텍스트를 상시 소모한다. 전역 코어 MCP 6개 이내 + 프로젝트별 선택 팩 MCP 최대 2개 (합계 8개 이내). (2026-10-02 사용자 결정으로 기존 "프로젝트당 3~5개"에서 변경 — 전역 코어에 UI 레퍼런스 MCP 추가)
 - SDD 프레임워크(Spec Kit, OpenSpec, GSD, BMAD, cc-sdd, Agent OS 등) 통설치 금지 — 이 템플릿의 AGENTS.md 파이프라인과 체계가 이중이 된다. 규칙 개선 참고용으로만.
 - 통합 하네스(superpowers 전체, everything-claude-code, wshobson/agents 전체) 통설치 금지 — 6-에이전트 팩과 역할 충돌. 개별 스킬만 선별 차용.
-- `.agents/skills/`는 안티그래비티·Codex·Claude Code 3개 도구가 공유하는 공통 호환 스킬 표준(`SKILL.md`)이며, 도구 간 충돌 없이 격리되어 작동한다. 3-도구 공통 마스터 규칙은 AGENTS.md에만 둔다.
+- `.agents/skills/`는 3개 도구가 함께 쓰는 공용 스킬 **원본**(`SKILL.md`)이다. 도구마다 발견 경로가 다르다: Claude Code는 `.claude/skills/`만 자동 발견하므로 원본마다 같은 이름의 연결 파일(`.claude/skills/{이름}/SKILL.md`, 원본 경로만 안내)을 둔다 — 공용 스킬을 추가하면 연결 파일도 함께 만든다. Codex는 `.agents/skills/`를 직접 읽는다(추정 — Codex 세션의 스킬 목록으로 확인). 안티그래비티의 자동 발견 여부는 미확인이며, 발견되지 않으면 AGENTS.md·역할 원본에 적힌 경로로 직접 읽는다. 3-도구 공통 마스터 규칙은 AGENTS.md에만 둔다.
 - LLM 게이트웨이/프록시(omniroute 등)를 Claude 구독 사용량 한도(429) 우회 목적으로 설치 금지 — **실측 결론(2026-09-06)**: `ANTHROPIC_BASE_URL`로 게이트웨이를 연결해도 claude.ai 구독 로그인이 활성 크레덴셜인 한 구독 사용량 한도가 그대로 적용된다(Anthropic 공식 문서, code.claude.com/docs/en/llm-gateway). 게이트웨이의 "429 시 자동 폴백"은 게이트웨이 자체가 보유한 여러 프로바이더/무료 API 사이의 별개 라우팅이지 구독 한도를 우회하는 기능이 아니다. 우회하려면 구독이 아닌 별도 API 키로 완전히 전환해야 하는데 이는 Anthropic 정책상 크레덴셜 중개·수집 금지 조항과 근접해 ToS 저촉 소지가 있다(code.claude.com/docs/en/legal-and-compliance). 한도 도달 시엔 리셋을 기다리거나 플랜을 조정한다.
 
 ## 전역 코어 (2026-08-17 설치, 2026-10-02 갱신 — 설치 여부는 상태 열 기준)

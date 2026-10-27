@@ -44,7 +44,7 @@ function main() {
       };
 
       // 1. 파일 도구에서 .env 접근 검사
-      const targetPaths = [args.AbsolutePath, args.TargetFile, args.SearchPath, args.DirectoryPath].filter(Boolean);
+      const targetPaths = [args.Path, args.AbsolutePath, args.TargetFile, args.SearchPath, args.DirectoryPath].filter(Boolean);
       for (const p of targetPaths) {
         if (isEnvPath(p)) {
           output({
@@ -80,7 +80,7 @@ function main() {
           const skipPatterns = [
             /--no-verify\b/,
             /--no-gpg-sign\b/,
-            /\bcommit\b[^\n]*\s-n\b/, // git commit -n (--no-verify 단축형)
+            /\bcommit\b[^\n]*\s-[aceCimnopqsSuvF]*n[aceCimnopqsSuvF]*\b/, // git commit -n / -nm / -mn (--no-verify 단축형 묶음 포함)
             /-c\s*commit\.gpgsign=false\b/,
             /-c\s*core\.hooksPath=/,
             /\bconfig\b[^\n]*core\.hooksPath\b/, // git config core.hooksPath <경로> (영구 설정)

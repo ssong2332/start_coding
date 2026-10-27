@@ -61,7 +61,9 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 | 한 작업의 문서화까지 완료 → 다음 작업 착수 | planner(다음 T-xx "진행" 전환) → implementer |
 | 진행 중 사용자가 기능 추가·요구사항 변경 요청 | planner — 아래 "진행 중 요구사항 변경" 표에 따라 architect 추가 호출 여부 결정 |
 
-Codex는 `.codex/agents/`의 동명 역할을 호출한다. 표의 `quality-assurance`는 Codex 에이전트 이름 `quality_assurance`에 대응한다. Claude Code는 `.claude/agents/`를 사용한다. 두 도구 모두 위 핸드오프 순서와 문서 소유권은 동일하다.
+역할의 단일 원본은 `.agents/roles/*.role.md`다(`quality-assurance`는 `qa.role.md`). Claude Code는 `.claude/agents/`를, Codex는 `.codex/agents/`의 동명 역할(`quality-assurance`는 `quality_assurance`)을 호출하며 두 쪽 모두 원본을 가리키는 연결 파일이다. 안티그래비티 세션은 원본을 직접 읽는다. 세 도구 모두 위 핸드오프 순서와 문서 소유권은 동일하다.
+
+**메인 오케스트레이터는 Claude Code 세션이다.** 위 표의 "메인 세션"은 기본적으로 Claude Code 세션을 뜻한다. Codex·안티그래비티 세션은 작업 하나를 맡는 실행자로 쓰며, 아래 "다른 도구 세션과의 핸드오프" 절을 따른다. 사용자가 다른 도구 세션에 작업을 직접 지시한 경우에도 같은 규칙과 보고 의무가 적용된다.
 
 ## 진행 중 요구사항 변경
 
@@ -154,6 +156,21 @@ implementer와 quality-assurance는 실행별로 .artifacts/verification/T-xx/{�
 
 여러 태스크를 동시에 진행할 때 "격리해서 작업하라"는 프롬프트 지시만으로는 격리되지 않는다 — 같은 작업 트리를 공유하는 에이전트는 서로의 산출물을 덮어쓰거나 지울 수 있다. 실행 옵션으로 격리한다(별도 git worktree, 또는 별도 체크아웃 — 도구가 지원하는 방식대로). 각 태스크가 서로 다른 파일만 건드린다고 확신할 때가 아니면, 격리 없는 병렬 실행은 하지 않는다 — 순차 실행이 기본이다.
 
+이 규칙은 도구가 달라도 같다. Claude Code·Codex·안티그래비티 세션이 같은 폴더를 열어 **동시에** 파일을 수정하면 서로 덮어쓴다. 다른 도구 세션이 작업 중인 동안 메인 세션은 그 범위의 파일을 수정하지 않고, 동시에 진행해야 하면 별도 worktree에서 연다.
+
+## 다른 도구 세션과의 핸드오프
+
+Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 방식은 둘이다: ① 메인 세션이 CLI로 위임 실행, ② 사용자가 같은 폴더를 해당 도구로 직접 열어 수행. 어느 쪽이든 아래를 따른다. Claude 쪽 실행 절차는 `.claude/skills/cli-delegate/SKILL.md`에 있다.
+
+| 항목 | 규칙 |
+|---|---|
+| 위치 | `.artifacts/handoff/{작업ID}/{실행ID}/` — Git 추적 제외. 작업 ID가 없으면 `ADHOC` |
+| 지시 | 메인 세션이 `prompt.md`에 역할 원본 경로·범위·완료 조건·오늘 날짜·근거(사용자 답변은 축어 인용)를 적는다. 본문을 명령줄 인자로 넘기지 않는다 — stdin이나 파일 경로로만 전달 |
+| 보고 | 작업을 받은 세션은 끝날 때 같은 폴더의 `report.md`에 보고 템플릿으로 남긴다(명령 원문·종료 코드·증거 경로 포함). 사용자가 프롬프트 파일 없이 직접 지시한 작업도 보고를 남긴다(작업 ID 없으면 `ADHOC`) — 메인 세션은 다른 도구의 대화를 볼 수 없다 |
+| 상태 전환 | 작업을 받은 세션은 docs/Tasks.md 상태를 바꾸지 않는다. 메인 세션이 보고를 검증한 뒤 planner로 전환한다 |
+| 검증 | 보고는 근거이지 증명이 아니다. 메인 세션은 `git diff`로 범위 밖 변경을 확인하고 통과 주장은 재실행해 대조한다. 재실행하지 못한 항목은 `미검증` |
+| 위험도 | 안티그래비티 CLI 위임은 전체 권한 우회 플래그가 필요하므로 실행마다 사용자 확인을 받는다 |
+
 ## 시크릿 관리
 
 - 실제 `.env` 파일(`.env.local` 등 변형 포함)은 에이전트가 읽기·수정·출력·복사하지 않는다. 값이 필요하면 사용자에게 요청한다.
@@ -196,18 +213,21 @@ implementer와 quality-assurance는 실행별로 .artifacts/verification/T-xx/{�
 | docs/ToolPacks.md | 사용자 | 읽기 전용 (설치 팩 카탈로그) |
 | docs/KitFeedback.md | 사용자 | 행 추가는 사용자 또는 메인 세션만 (6-에이전트는 소유 문서 외 수정 금지 규칙에 따라 불가 — 보고서로 전달) — 기존 행 수정 금지(상태 열 제외) |
 | .claude/hooks/, .claude/settings.json | 사용자 | 읽기 전용 — 차단을 우회하려고 편집하는 대상이 아니다 |
-| .agents/hooks.json, .agents/scripts/, scripts/agy-guard.js | 사용자 | 읽기 전용 (안티그래비티 강제 계층·실행 진입점) — 우회 목적 편집 금지 |
+| .agents/hooks.json, .agents/scripts/, scripts/agy-guard.js, scripts/check-syntax.js, scripts/test-agy-hook-cwd.js | 사용자 | 읽기 전용 (안티그래비티 강제 계층·실행 진입점·구문 및 훅 회귀 검사) — 우회 목적 편집 금지 |
 | .codex/hooks.json | 사용자 | 읽기 전용 (Codex 강제 계층) — 우회 목적 편집 금지 |
 | .codex/agents/ | 사용자 | 읽기 전용 (Codex 6-에이전트 정의 — 실행 중 자기 정의 수정 금지) |
+| .agents/roles/ | 사용자 | 읽기 전용 (역할 단일 원본 — 실행 중 자기 정의 수정 금지) |
+| .claude/skills/ | 사용자 | 읽기 전용 (공용 스킬 연결 파일과 Claude 전용 스킬 cli-delegate) |
 | .agents/skills/ | 사용자 | 읽기 전용 (3-도구 공용 상세 가이드) |
-| .claude/agents/ | 사용자 | 읽기 전용 (6-에이전트 정의 — 에이전트가 실행 중 자기 정의를 고치는 대상이 아니다) |
+| .claude/agents/ | 사용자 | 읽기 전용 (6-에이전트 연결 파일 — 도구 권한·모델만 정의. 에이전트가 실행 중 자기 정의를 고치는 대상이 아니다) |
 | scripts/init.ps1, scripts/init.sh | 사용자 | 읽기 전용 (초기화 스크립트, 1회성) |
 | .editorconfig, .gitattributes, .gitignore | 사용자 | 읽기 전용 (`.gitignore`의 `.env` 제외 항목이 시크릿 관리 절의 전제) |
 | .env.example | 사용자 (요청 시 architect·implementer가 새 변수 추가) | 실제 값 금지, 플레이스홀더만. 새 환경 변수를 도입하면 이 파일도 함께 갱신 |
 | docs/HarnessAudit.md | 사용자 | 읽기 전용 (하네스 자체 — 이 파일·CLAUDE.md·`.claude/agents/*.md`·규칙을 담은 `docs/*.md` 편집 후 사람이 직접 도는 체크리스트. 파이프라인 문서가 아니므로 문서 우선순위엔 없음) |
 | docs/UpdateRequests.md | docs (행 추가만, append-only) | 담당으로 지목된 planner/architect가 상태 열만 `open`→`resolved`로 변경 가능. 그 외 읽기 전용 |
 | .artifacts/verification/ | implementer·quality-assurance (자기 실행의 로그·메타데이터 생성) | 그 외 읽기 전용, 기존 증거 덮어쓰기·삭제 금지 |
-| .codex/EXECUTION.md | 사용자 | Codex 실행 결과 수집 지침, 읽기 전용 |
+| .codex/EXECUTION.md, .codex/DEVELOPMENT.md, .codex/FRONTEND.md, .codex/tests/ | 사용자 | Codex 실행 결과 수집·개발 보조·UI 지침과 그 연결 검사, 읽기 전용 |
+| .artifacts/handoff/ | 메인 세션(prompt.md 작성)·작업을 받은 세션(같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
 | 소스 코드 | implementer | 읽기 전용 |
 
 ## 공용 스킬 (.agents/skills/)

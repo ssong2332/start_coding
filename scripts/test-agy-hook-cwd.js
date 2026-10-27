@@ -7,8 +7,26 @@ const { test, after } = require("node:test");
 
 const root = path.resolve(__dirname, "..");
 const hooks = JSON.parse(fs.readFileSync(path.join(root, ".agents/hooks.json"), "utf8"));
+const guardMatcher = hooks["safety-guard"].PreToolUse[0].matcher;
 const guardCommand = hooks["safety-guard"].PreToolUse[0].hooks[0].command;
 const stopCommand = hooks["syntax-guard"].Stop[0].command;
+
+test("PreToolUse matcher covers both current (read_file/write_file/edit_file) and legacy file/command tools", () => {
+  const matcherRegex = new RegExp(`^(?:${guardMatcher})$`);
+  for (const tool of [
+    "read_file",
+    "write_file",
+    "edit_file",
+    "view_file",
+    "replace_file_content",
+    "multi_replace_file_content",
+    "write_to_file",
+    "grep_search",
+    "run_command",
+  ]) {
+    assert.ok(matcherRegex.test(tool), `Matcher "${guardMatcher}" must match tool "${tool}"`);
+  }
+});
 // 임시 fixture는 보존 증거가 아니다 — .artifacts/verification/ 밖에 만들고 이 실행이 끝나면 지운다.
 const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "agy-cwd-"));
 after(() => fs.rmSync(fixtureDir, { recursive: true, force: true }));
@@ -33,9 +51,15 @@ function run(command, cwd, payload, env = {}) {
 for (const [label, cwd] of [["root", root], [".agents", path.join(root, ".agents")]]) {
   const cases = [
     ["safe command", { toolCall: { name: "run_command", args: { CommandLine: "node --version" } } }, "allow"],
-    ["example boundary", { toolCall: { name: "view_file", args: { AbsolutePath: "dummy/.env.example" } } }, "allow"],
-    ["secret boundary without file access", { toolCall: { name: "view_file", args: { AbsolutePath: "dummy/.env" } } }, "deny"],
+    ["example boundary (legacy view_file)", { toolCall: { name: "view_file", args: { AbsolutePath: "dummy/.env.example" } } }, "allow"],
+    ["secret boundary without file access (legacy view_file)", { toolCall: { name: "view_file", args: { AbsolutePath: "dummy/.env" } } }, "deny"],
+    ["example boundary (read_file Path)", { toolCall: { name: "read_file", args: { Path: "dummy/.env.example" } } }, "allow"],
+    ["secret boundary (read_file Path)", { toolCall: { name: "read_file", args: { Path: "dummy/.env" } } }, "deny"],
+    ["secret variant boundary (edit_file Path)", { toolCall: { name: "edit_file", args: { Path: "dummy/.env.local" } } }, "deny"],
+    ["secret boundary (write_file Path)", { toolCall: { name: "write_file", args: { Path: "dummy/.env.production" } } }, "deny"],
     ["bypass command payload without git execution", { toolCall: { name: "run_command", args: { CommandLine: "git commit --no-verify" } } }, "deny"],
+    ["short bypass flag cluster (-nm)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -nm "x"' } } }, "deny"],
+    ["short bypass flag cluster (-mn)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -mn "x"' } } }, "deny"],
     ["malformed JSON retains fail-open contract", "{invalid", "allow"],
     ["empty input", "", "allow"],
   ];

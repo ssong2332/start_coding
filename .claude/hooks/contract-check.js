@@ -164,7 +164,8 @@ function checkPlaceholders(findings) {
       const full = path.join(dir, e.name);
       const rel = path.relative(ROOT, full).replace(/\\/g, "/");
       if (e.isDirectory()) {
-        if (!SKIP.has(e.name)) walk(full);
+        // .claude/worktrees/ 는 다른 브랜치의 킷 사본이라 이 리포의 모순이 아니다
+        if (!SKIP.has(e.name) && rel !== ".claude/worktrees") walk(full);
         continue;
       }
       if (rel === "README.md" || rel.startsWith("docs/")) continue; // init 치환 대상
