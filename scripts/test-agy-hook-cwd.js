@@ -60,8 +60,13 @@ for (const [label, cwd] of [["root", root], [".agents", path.join(root, ".agents
     ["bypass command payload without git execution", { toolCall: { name: "run_command", args: { CommandLine: "git commit --no-verify" } } }, "deny"],
     ["short bypass flag cluster (-nm)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -nm "x"' } } }, "deny"],
     ["short bypass flag cluster (-mn)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -mn "x"' } } }, "deny"],
-    ["quoted message text is not a flag (-en)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -m "use -en flag"' } } }, "allow"],
+    // 메시지 텍스트 오탐은 합집합 설계(인자 단위 검사 + 이전 정규식)의 의도된 대가 — 2026-10-27 재리뷰 치명 1~3
+    ["quoted message text is blocked by legacy regex (union)", { toolCall: { name: "run_command", args: { CommandLine: 'git commit -m "use -en flag"' } } }, "deny"],
     ["quoted -n argument is still a flag", { toolCall: { name: "run_command", args: { CommandLine: 'git commit "-n" -m x' } } }, "deny"],
+    ["bash -c string (review critical 1)", { toolCall: { name: "run_command", args: { CommandLine: 'bash -c "git commit -n -m x"' } } }, "deny"],
+    ["windows backslash git path (review critical 2)", { toolCall: { name: "run_command", args: { CommandLine: '"C:\\Program Files\\Git\\cmd\\git.exe" commit -n' } } }, "deny"],
+    ["backtick subshell (review critical 3)", { toolCall: { name: "run_command", args: { CommandLine: "echo `git commit -n`" } } }, "deny"],
+    ["redirect attached to flag (review critical 3)", { toolCall: { name: "run_command", args: { CommandLine: "git commit -n>/dev/null" } } }, "deny"],
     ["malformed JSON retains fail-open contract", "{invalid", "allow"],
     ["empty input", "", "allow"],
   ];

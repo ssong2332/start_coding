@@ -79,17 +79,28 @@ const CASES = [
   ["block-no-verify.js", bash("git log -n 5"), "ALLOW", "commit이 아닌 곳의 -n은 count 옵션"],
   ["block-no-verify.js", bash(`${GC} -m "x"`), "ALLOW", "평범한 커밋"],
   ["block-no-verify.js", bash(`${GC} --amend`), "ALLOW", "amend는 우회가 아니다"],
-  ["block-no-verify.js", bash(`${GC} -m "use -en flag"`), "ALLOW", "메시지 따옴표 안의 -en은 플래그가 아니다 (2026-10-27 리뷰 권고 2)"],
-  ["block-no-verify.js", bash(`${GC} -m 'see -n docs'`), "ALLOW", "작은따옴표 메시지 안의 -n도 텍스트"],
-  ["block-no-verify.js", bash(`echo "${GC} -n"`), "ALLOW", "echo 인자 문자열 안의 커밋 명령은 실행되지 않는다"],
-  ["block-no-verify.js", bash(`${GC} "-n" -m x`), "BLOCK", "따옴표로 감싸도 git은 -n 플래그로 받는다"],
+  // 아래 세 건은 오탐이지만 의도된 차단이다 — 인자 단위 검사만 쓰면 bash -c·백틱·Windows 경로 우회가
+  // 뚫려서(2026-10-27 재리뷰 치명 1~3) 이전 정규식을 합집합으로 되살렸다. 안전 쪽을 택한 대가.
+  ["block-no-verify.js", bash(`${GC} -m "use -en flag"`), "BLOCK", "메시지 텍스트 오탐 — 합집합 설계의 대가"],
+  ["block-no-verify.js", bash(`${GC} -m 'see -n docs'`), "BLOCK", "작은따옴표 메시지 오탐 — 같은 대가"],
+  ["block-no-verify.js", bash(`echo "${GC} -n"`), "BLOCK", "문자열 안 언급도 차단 — 같은 대가"],
+  ["block-no-verify.js", bash(`${GC} "-n" -m x`), "BLOCK", "따옴표로 감싸도 git은 -n 플래그로 받는다 (인자 단위 검사가 잡음)"],
+  ["block-no-verify.js", bash(`bash -c "${GC} -n -m x"`), "BLOCK", "bash -c 문자열 안의 커밋 (재리뷰 치명 1)"],
+  ["block-no-verify.js", bash(`powershell -Command "${GC} -n"`), "BLOCK", "powershell -Command 문자열 안 (치명 1)"],
+  ["block-no-verify.js", bash(`"C:\\Program Files\\Git\\cmd\\git.exe" commit -n`), "BLOCK", "Windows 역슬래시 경로의 git (치명 2)"],
+  ["block-no-verify.js", bash("echo `" + `${GC} -n` + "`"), "BLOCK", "백틱 서브셸 안의 커밋 (치명 3)"],
+  ["block-no-verify.js", bash(`${GC} -n>/dev/null`), "BLOCK", "리다이렉트가 붙은 플래그 (치명 3)"],
+  ["block-no-verify.js", bash(`git -c alias.c=commit c -n`), "BLOCK", "별칭 경유 커밋 (재리뷰 권고 8)"],
   ["block-no-verify.js", bash(`git -C repo commit -n -m x`), "BLOCK", "commit 앞의 git 전역 옵션"],
   ["block-no-verify.js", bash(`cd repo && ${GC} -nm x`), "BLOCK", "연결된 명령 구간 안의 커밋"],
   // confirm-agy-delegate — 안티그래비티 권한 우회 실행은 매번 사용자 확인 (리뷰 권고 4)
   ["confirm-agy-delegate.js", bash(`agy --dangerously-skip-permissions -p "Read x/prompt.md"`), "ASK", "권한 우회 위임 실행"],
   ["confirm-agy-delegate.js", bash(`cd repo && agy.exe --dangerously-skip-permissions -p "x"`), "ASK", "연결 명령·.exe 이름"],
   ["confirm-agy-delegate.js", bash(`agy --help`), "ALLOW", "권한 우회 플래그 없는 agy"],
-  ["confirm-agy-delegate.js", bash(`echo "agy --dangerously-skip-permissions"`), "ALLOW", "문자열로만 언급"],
+  ["confirm-agy-delegate.js", bash(`echo "agy --dangerously-skip-permissions"`), "ASK", "문자열 언급도 확인 창 — 합집합 설계의 대가(차단이 아니라 확인이라 무해)"],
+  ["confirm-agy-delegate.js", bash(`bash -c "agy --dangerously-skip-permissions -p x"`), "ASK", "bash -c 문자열 안 (재리뷰 권고 4)"],
+  ["confirm-agy-delegate.js", bash(`agy.cmd --dangerously-skip-permissions -p x`), "ASK", "npm 래퍼 이름"],
+  ["confirm-agy-delegate.js", bash(`agy --dangerously-skip-permissions=true -p x`), "ASK", "= 값 형태"],
   ["confirm-agy-delegate.js", bash("npm test"), "ALLOW", "무관한 명령"],
   // block-main-writes — 브랜치 무관 케이스
   [
