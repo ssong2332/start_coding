@@ -97,6 +97,9 @@ const CASES = [
   ["block-no-verify.js", bash(`GIT.EXE commit -n -m x`), "BLOCK", "대문자 실행 파일 이름 + 짧은 플래그"],
   ["block-no-verify.js", bash(`GIT commit --no-` + "verify"), "BLOCK", "대문자 git + 장문형"],
   ["block-no-verify.js", bash(`Git commit -nm x`), "BLOCK", "섞인 대소문자 + 클러스터"],
+  // 대소문자 구분을 없앤 뒤의 오탐 방지 (f8fed91 재리뷰 권고 2)
+  ["block-no-verify.js", bash(`GIT log -n 5`), "ALLOW", "대문자 git의 commit 아닌 -n (count 옵션)"],
+  ["block-no-verify.js", bash(`Git commit -m "x"`), "ALLOW", "섞인 대소문자의 평범한 커밋"],
   // confirm-agy-delegate — 안티그래비티 권한 우회 실행은 매번 사용자 확인 (리뷰 권고 4)
   ["confirm-agy-delegate.js", bash(`agy --dangerously-skip-permissions -p "Read x/prompt.md"`), "ASK", "권한 우회 위임 실행"],
   ["confirm-agy-delegate.js", bash(`cd repo && agy.exe --dangerously-skip-permissions -p "x"`), "ASK", "연결 명령·.exe 이름"],
@@ -116,6 +119,11 @@ const CASES = [
   ["block-main-writes.js", bash(`${GP} origin +fix/x:main`), "BLOCK", "강제 push도 동일하게 차단"],
   ["block-main-writes.js", bash(`GIT.EXE push origin fix/x:main`), "BLOCK", "대문자 실행 파일 이름의 refspec push (재리뷰 권고 5)"],
   ["block-main-writes.js", bash(`${GP} origin "fix/x:main"`), "BLOCK", "인용부호로 감싼 refspec"],
+  // Windows에서 흔한 따옴표 감싼 전체 경로 — git.exe 바로 뒤에 닫는 따옴표가 온다 (2026-10-28 f8fed91 재리뷰 권고 1)
+  ["block-main-writes.js", bash(`"C:\\Program Files\\Git\\cmd\\git.exe" push origin fix/x:main`), "BLOCK", "따옴표 감싼 git.exe 경로의 refspec push"],
+  // 대소문자 구분을 없앤 뒤의 오탐 방지 (f8fed91 재리뷰 권고 2)
+  ["block-main-writes.js", bash(`GIT push origin main`), "ALLOW", "대문자 git의 평범한 push"],
+  ["block-main-writes.js", bash(`GIT.EXE log --oneline -1`), "ALLOW", "대문자 git의 무관한 하위 명령"],
   ["block-main-writes.js", bash(`${GP} origin main`), "ALLOW", "같은 브랜치의 평범한 push"],
   ["block-main-writes.js", bash(`${GP} origin main:main`), "ALLOW", "명시적 main:main도 평범한 push"],
   [
@@ -131,6 +139,12 @@ const CASES = [
     bash(`${GC} -m "x"`),
     onProtectedBranch ? "BLOCK" : "ALLOW",
     `현재 브랜치가 ${onProtectedBranch ? "main/master라 차단돼야 함" : "main/master가 아니라 허용돼야 함"}`,
+  ],
+  [
+    "block-main-writes.js",
+    bash(`"C:\\Program Files\\Git\\cmd\\git.exe" commit -m "x"`),
+    onProtectedBranch ? "BLOCK" : "ALLOW",
+    `따옴표 감싼 git.exe 경로의 커밋 — ${onProtectedBranch ? "main/master라 차단돼야 함" : "main/master가 아니라 허용돼야 함"} (f8fed91 재리뷰 권고 1)`,
   ],
   [
     "block-main-writes.js",

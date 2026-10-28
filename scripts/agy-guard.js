@@ -112,9 +112,10 @@ function main() {
           }
 
           // 2-3. main/master 브랜치 직접 커밋 검사
-          const isCommit = /\bgit(?:\.exe)?\s+commit\b/i.test(command);
+          // git(.exe) 뒤 ["']? 는 따옴표 감싼 전체 경로("...\git.exe" commit) — f8fed91 재리뷰 권고 1
+          const isCommit = /\bgit(?:\.exe)?["']?\s+commit\b/i.test(command);
           const refspec = command.match(
-            /\bgit(?:\.exe)?\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/i
+            /\bgit(?:\.exe)?["']?\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/i
           );
 
           if (isCommit || refspec) {
