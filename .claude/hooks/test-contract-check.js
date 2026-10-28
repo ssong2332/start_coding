@@ -24,6 +24,8 @@ place("src/worktrees/notes.md");
 place(".artifacts/handoff/KIT-AUDIT/S9/report.md");
 place("src/.artifacts/notes.md");
 place("src/docs/notes.md");
+place("docs/notes.md");
+place("README.md");
 
 function c5Lines() {
   const r = spawnSync(process.execPath, [SCRIPT, "--report"], { cwd: fixtureRoot, encoding: "utf8" });
@@ -56,4 +58,10 @@ test("C5: 루트가 아닌 .artifacts 이름 폴더는 제외하지 않는다", 
 
 test("C5: 루트가 아닌 docs 이름 폴더는 제외하지 않는다", () => {
   assert.ok(c5Lines().some((l) => l.startsWith("C5 src/docs/notes.md:")));
+});
+
+// init 치환 대상인 루트 docs/·README.md는 계속 제외돼야 한다 (2026-10-28 f8fed91 재리뷰 권고 3)
+test("C5: 루트 docs/와 README.md는 init 치환 대상이라 검사하지 않는다", () => {
+  const hits = c5Lines().filter((l) => l.startsWith("C5 docs/") || l.startsWith("C5 README.md:"));
+  assert.deepEqual(hits, []);
 });

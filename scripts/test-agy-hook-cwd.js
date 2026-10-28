@@ -70,6 +70,9 @@ for (const [label, cwd] of [["root", root], [".agents", path.join(root, ".agents
     ["uppercase git executable (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT.EXE commit -n -m x" } } }, "deny"],
     ["uppercase git long flag (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT commit --no-" + "verify" } } }, "deny"],
     ["uppercase git refspec push to main (review rec 5)", { toolCall: { name: "run_command", args: { CommandLine: "GIT.EXE push origin fix/x:main" } } }, "deny"],
+    ["quoted git.exe path refspec push to main (f8fed91 review rec 1)", { toolCall: { name: "run_command", args: { CommandLine: '"C:\\Program Files\\Git\\cmd\\git.exe" push origin fix/x:main' } } }, "deny"],
+    ["uppercase git non-commit -n is allowed (f8fed91 review rec 2)", { toolCall: { name: "run_command", args: { CommandLine: "GIT log -n 5" } } }, "allow"],
+    ["uppercase git plain push is allowed (f8fed91 review rec 2)", { toolCall: { name: "run_command", args: { CommandLine: "GIT push origin main" } } }, "allow"],
     ["malformed JSON retains fail-open contract", "{invalid", "allow"],
     ["empty input", "", "allow"],
   ];
