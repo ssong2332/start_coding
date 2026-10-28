@@ -14,10 +14,10 @@
 
 | 항목 | 정체 | 상태 |
 |---|---|---|
-| context7 | MCP (라이브러리 최신 문서) | 연결됨 (플러그인) |
-| sequential-thinking | MCP (단계적 추론) | 연결됨 (user 스코프) |
+| context7 | MCP (라이브러리 최신 문서) | 설치됨 (플러그인). 2026-10-27 Claude 데스크톱 세션에서 연결 실패(앱이 "recent failure cached"로 재시도 보류) — 원인 미확인, `/mcp`에서 재연결로 확인 |
+| sequential-thinking | MCP (단계적 추론) | 설치됨 (user 스코프). 2026-10-27 같은 세션에서 연결 시간 초과(30초) — 원인 미확인, `/mcp`에서 재연결로 확인 |
 | GitHub MCP | MCP (이슈·PR·CI) | 연결됨 (claude.ai 커넥터) |
-| playwright | MCP (E2E 브라우저) | 연결됨 (플러그인) |
+| playwright | MCP (E2E 브라우저 자동화 — 세션 중 조작용. 프로젝트의 E2E 회귀 테스트 러너와는 별개) | 설치됨 (플러그인). 2026-10-27 같은 세션에서 연결 실패(재시도 보류) — 원인 미확인. 세션 중 실물 확인은 Claude 앱 Browser pane으로 대신할 수 있다 |
 | Figma MCP | MCP (디자인→코드) | 연결됨 (claude.ai 커넥터). 무료(Starter) 플랜은 도구 호출 월 20회 한도 (Figma 공식 rate-limits 문서, 2026-10-02 확인) |
 | Lazyweb MCP | MCP (UI 레퍼런스 검색 — 실제 서비스 화면·플로우) | **미설치** — 사용자가 lazyweb.com 계정으로 토큰을 발급한 뒤 등록: `claude mcp add --transport http --scope user lazyweb https://www.lazyweb.com/mcp --header "Authorization: Bearer <token from ~/.lazyweb/lazyweb_mcp_token>"` (lazyweb.com/claude.md 원문). 무료 판정 F2 — MCP 사용은 무료, 비Pro 계정은 리포트 일부만. 원격 `install.sh`를 바로 실행하는 설치 방식 사용 금지, 프로젝트 기밀 정보(목표·회사명 등) 입력 금지, 토큰 git 커밋 금지 |
 | claude-mem | 플러그인 (세션 메모리 지속성) | 설치됨 (`claude-mem install` 완료) |

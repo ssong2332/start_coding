@@ -16,12 +16,13 @@ readHookInput((payload) => {
   const command = payload?.tool_input?.command;
   if (typeof command !== "string") process.exit(0);
 
-  const isCommit = /\bgit\s+commit\b/.test(command);
+  // Windows는 실행 파일 이름 대소문자를 가리지 않는다(GIT.EXE도 git) — 재리뷰 권고 5
+  const isCommit = /\bgit(?:\.exe)?\s+commit\b/i.test(command);
   // 예: "git push origin fix/x:main", "git push origin HEAD:refs/heads/master",
   //     "git push origin +fix/x:main" (강제), "git push origin 'fix/x:main'" (인용부호).
   // dst 뒤 (?=["'\s]|$) 는 "feature:main-fix" 같은 하이픈 붙은 브랜치를 오탐하지 않기 위함.
   const refspec = command.match(
-    /\bgit\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/
+    /\bgit(?:\.exe)?\s+push\b[^\n]*\s["'+]?([\w./-]+):(?:refs\/heads\/)?(main|master)(?=["'\s]|$)/i
   );
   if (!isCommit && !refspec) process.exit(0);
 

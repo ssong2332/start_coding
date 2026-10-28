@@ -9,7 +9,7 @@
 | 대기 | 착수 전 | 초기값 (planner가 작업 생성 시) |
 | 진행 | 구현 중 | planner가 작업 착수 시 |
 | 검증중 | 리뷰/QA 단계 | planner가 implementer의 "검증 전환 요청"(구현 근거 첨부)을 받고 근거 기록과 함께 |
-| 완료 | DefinitionOfDone 전부 통과 + 근거 기록됨 | planner가 리뷰·QA 통과 보고를 받은 뒤 |
+| 완료 | DefinitionOfDone 전부 통과 + 근거 기록됨 | planner가 리뷰·QA 통과 보고와 (화면 AC가 있으면) 메인 세션의 사용자 확인 결과를 받은 뒤 |
 | 보류 | 사용자 결정 대기 (Open Question 번호 기재) | planner |
 
 상태 전환은 전부 planner만 수행한다 — 다른 에이전트는 요청·보고로만 관여한다.
