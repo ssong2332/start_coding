@@ -22,6 +22,7 @@
 | Lazyweb MCP | MCP (UI 레퍼런스 검색 — 실제 서비스 화면·플로우) | **미설치** — 사용자가 lazyweb.com 계정으로 토큰을 발급한 뒤 등록: `claude mcp add --transport http --scope user lazyweb https://www.lazyweb.com/mcp --header "Authorization: Bearer <token from ~/.lazyweb/lazyweb_mcp_token>"` (lazyweb.com/claude.md 원문). 무료 판정 F2 — MCP 사용은 무료, 비Pro 계정은 리포트 일부만. 원격 `install.sh`를 바로 실행하는 설치 방식 사용 금지, 프로젝트 기밀 정보(목표·회사명 등) 입력 금지, 토큰 git 커밋 금지 |
 | claude-mem | 플러그인 (세션 메모리 지속성) | 설치됨 (`claude-mem install` 완료) |
 | ponytail | 플러그인 (YAGNI·최소 코드 강제) | 설치됨 (full 모드) |
+| Agent Reach (`Panniantong/Agent-Reach`) | CLI + 스킬 (유튜브 자막·GitHub·웹 읽기·검색, 읽기 전용. MCP 아님 — MCP 개수 한도에 세지 않는다). MIT, 무료 판정 F1 | 설치됨 (2026-11-17, v1.6.1, `uv tool install https://github.com/Panniantong/Agent-Reach/releases/latest/download/agent-reach.zip` → `agent-reach setup`). 스킬이 `~/.agents/skills`·`~/.claude/skills`·`~/.gemini/skills`·`~/.copilot/skills` 네 곳에 놓인다. 실측 `agent-reach check` 15개 중 13개 통과(실패 2건은 bilibili). X·Reddit 채널은 미추가(`agent-reach add <채널>` + 본인 로그인 필요). **주의**: ① PyPI의 `agent-reach`는 다른 패키지다 — pip로 설치 금지 ② 사용자 폴더명이 한글이면 `setup`·`add`가 경로 인코딩 오류로 실패한다 — `PYTHONUTF8=1`을 설정하고 실행 ③ 웹 읽기·검색은 Jina·Exa를 경유하므로 비공개 주소·민감한 검색어를 넣지 않는다 ④ 공개 내용은 도구 내장 검색·읽기를 먼저 쓰고 안 될 때만 쓴다 |
 | 스킬 7종 | frontend-design, theme-factory, brainstorming, taste-skill, animate, impeccable, ui-ux-pro-max(CLI만, 프로젝트별 `uipro init`) | `~/.claude/skills` 설치됨. impeccable만 `~/.agents/skills/`에도 설치돼 안티그래비티에서도 잡힌다. **`~/.codex/skills/`는 비어 있다 (2026-08-18 실측) — Codex에서는 이 스킬들이 전부 없는 상태다** |
 
 Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료로 동작하는 것이 Lazyweb뿐이었다. Mobbin("available on Pro, Team, and Enterprise plans" — Mobbin 자체 플랜이며 Claude 플랜과 무관)·Refero·NicelyDone은 유료 플랜이 필수(F3)이고, InspoAI(inspoai.io)는 문서상 npm 패키지 `@inspoai/mcp`가 E404이고 원격 엔드포인트 접속도 실패해 보류(F4)했다.
@@ -102,7 +103,7 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 
 | 항목 | 정체 | 쓰는 시점·주의 |
 |---|---|---|
-| public-apis (`public-apis/public-apis`) | 공개 API 링크 목록 — README 표 형식(API·설명·Auth·HTTPS·CORS), 2026-11-17 기준 표 행 약 2,480개, MIT, 무료 판정 F1 (GitHub API 실측) | 설계 단계에서 외부 API 후보를 찾을 때 README를 열어 본다. 설치·복제하지 않는다. 목록에 있다는 것이 무료·안정성을 보장하지 않는다 — 채택 전에 해당 API의 요금·호출 한도·약관을 직접 확인하고 architect가 docs/Architecture.md에 근거를 기록한다. API 키가 필요하면 "시크릿 관리" 절을 따른다 |
+| public-apis (`public-apis/public-apis`) | 공개 API 링크 목록 — README 표 형식(API·설명·Auth·HTTPS·CORS), 2026-11-17 기준 표 행 약 2,480개, MIT, 무료 판정 F1 (GitHub API 실측). 재확인 방법: 라이선스·최종 푸시·보관 여부는 `gh api repos/public-apis/public-apis --jq '{license:.license.spdx_id,pushed_at,archived}'`, 행 수는 `gh api repos/public-apis/public-apis/readme --jq .content`를 base64로 풀어 세로선과 대괄호로 시작하는 표 행을 `grep -c`로 센 값(광고·예시 행이 섞일 수 있어 "약") | 설계 단계에서 외부 API 후보를 찾을 때 README를 열어 본다. 설치·복제하지 않는다. 목록에 있다는 것이 무료·안정성을 보장하지 않는다 — 채택 전에 해당 API의 요금·호출 한도·약관을 직접 확인하고 architect가 docs/Architecture.md에 근거를 기록한다. API 키가 필요하면 "시크릿 관리" 절을 따른다 |
 
 ## 판정 규칙 (새 프로젝트 시작 시)
 
