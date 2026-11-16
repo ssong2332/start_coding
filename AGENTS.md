@@ -278,6 +278,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 |---|---|---|
 | **idea-interview** | **아이디어 → 명세 대화형 인터뷰 절차, 커버리지 12항목, 추천·반대 제시 규칙, 종료 조건** | **메인 세션 (기획 착수 전 필수)** |
 | tdd-practitioner | Red-Green-Refactor 절차, 테스트 케이스 도출 기준, 부실 테스트 방지 체크리스트 | implementer, quality-assurance |
+| root-cause-debugging | 실패 원인 진단 절차 (재현 → 위치 좁히기 → 최소화 → 근본 수정 → 재발 방지), 재현 불가 분기표, 에러 출력 비신뢰 규칙 | implementer (진단·수정), quality-assurance·reviewer (진단까지만) |
 | clean-architecture | 계층 분리, 의존성 역전, DTO 경계, 순환 참조 금지 | architect, implementer, reviewer |
 | security-audit | 시크릿·주입·인증/인가(IDOR)·입력 검증 체크리스트 | reviewer, implementer, 보안 요구 시 architect |
 | web-performance | Core Web Vitals, 렌더링 최적화, 접근성(a11y) | 웹 프로젝트의 implementer, quality-assurance, reviewer |
