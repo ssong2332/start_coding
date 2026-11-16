@@ -98,6 +98,12 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | oh-my-mermaid (코드베이스 다이어그램) | `npm i -g oh-my-mermaid && omm setup` |
 | mermaid-skill (다이어그램 23종) | 스킬 폴더 복사 |
 
+## 참고 자료 (설치 대상 아님)
+
+| 항목 | 정체 | 쓰는 시점·주의 |
+|---|---|---|
+| public-apis (`public-apis/public-apis`) | 공개 API 링크 목록 — README 표 형식(API·설명·Auth·HTTPS·CORS), 2026-11-17 기준 표 행 약 2,480개, MIT, 무료 판정 F1 (GitHub API 실측) | 설계 단계에서 외부 API 후보를 찾을 때 README를 열어 본다. 설치·복제하지 않는다. 목록에 있다는 것이 무료·안정성을 보장하지 않는다 — 채택 전에 해당 API의 요금·호출 한도·약관을 직접 확인하고 architect가 docs/Architecture.md에 근거를 기록한다. API 키가 필요하면 "시크릿 관리" 절을 따른다 |
+
 ## 판정 규칙 (새 프로젝트 시작 시)
 
 | 조건 | 설치 |
