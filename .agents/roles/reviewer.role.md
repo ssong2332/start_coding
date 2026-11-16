@@ -19,7 +19,7 @@
 5. docs/GitWorkflow.md
 6. docs/DefinitionOfDone.md
 7. docs/Tasks.md (대상 작업 확인)
-8. `.agents/skills/security-audit/SKILL.md` (보안 체크리스트), `.agents/skills/clean-architecture/SKILL.md` (계층·의존성 위반), 웹 UI 변경이면 `.agents/skills/web-performance/SKILL.md`
+8. `.agents/skills/security-audit/SKILL.md` (보안 체크리스트), `.agents/skills/clean-architecture/SKILL.md` (계층·의존성 위반), 웹 UI 변경이면 `.agents/skills/web-performance/SKILL.md`, 실패 원인 진단이 필요하면 `.agents/skills/root-cause-debugging/SKILL.md` (1~3단계 진단까지만)
 
 ## 절차
 1. 대상 확정: 호출자가 지정한 파일, 없으면 `git diff` (스테이징 포함 작업 트리 변경분)
