@@ -8,7 +8,7 @@
 - SDD 프레임워크(Spec Kit, OpenSpec, GSD, BMAD, cc-sdd, Agent OS 등) 통설치 금지 — 이 템플릿의 AGENTS.md 파이프라인과 체계가 이중이 된다. 규칙 개선 참고용으로만.
 - 통합 하네스(superpowers 전체, everything-claude-code, wshobson/agents 전체) 통설치 금지 — 6-에이전트 팩과 역할 충돌. 개별 스킬만 선별 차용.
 - `.agents/skills/`는 3개 도구가 함께 쓰는 공용 스킬 **원본**(`SKILL.md`)이다. 도구마다 발견 경로가 다르다: Claude Code는 `.claude/skills/`만 자동 발견하므로 원본마다 같은 이름의 연결 파일(`.claude/skills/{이름}/SKILL.md`, 원본 경로만 안내)을 둔다 — 공용 스킬을 추가하면 연결 파일도 함께 만든다. Codex는 `.agents/skills/`를 직접 읽는다(추정 — Codex 세션의 스킬 목록으로 확인). 안티그래비티의 자동 발견 여부는 미확인이며, 발견되지 않으면 AGENTS.md·역할 원본에 적힌 경로로 직접 읽는다. 3-도구 공통 마스터 규칙은 AGENTS.md에만 둔다.
-- LLM 게이트웨이/프록시(omniroute 등)를 Claude 구독 사용량 한도(429) 우회 목적으로 설치 금지 — **실측 결론(2026-09-06)**: `ANTHROPIC_BASE_URL`로 게이트웨이를 연결해도 claude.ai 구독 로그인이 활성 크레덴셜인 한 구독 사용량 한도가 그대로 적용된다(Anthropic 공식 문서, code.claude.com/docs/en/llm-gateway). 게이트웨이의 "429 시 자동 폴백"은 게이트웨이 자체가 보유한 여러 프로바이더/무료 API 사이의 별개 라우팅이지 구독 한도를 우회하는 기능이 아니다. 우회하려면 구독이 아닌 별도 API 키로 완전히 전환해야 하는데 이는 Anthropic 정책상 크레덴셜 중개·수집 금지 조항과 근접해 ToS 저촉 소지가 있다(code.claude.com/docs/en/legal-and-compliance). 한도 도달 시엔 리셋을 기다리거나 플랜을 조정한다.
+- LLM 게이트웨이/프록시(omniroute 등)를 Claude 구독 사용량 한도(429) 우회 목적으로 설치 금지 — **실측 결론(2026-09-06)**: `ANTHROPIC_BASE_URL`로 게이트웨이를 연결해도 claude.ai 구독 로그인이 활성 크레덴셜인 한 구독 사용량 한도가 그대로 적용된다(Anthropic 공식 문서, code.claude.com/docs/en/llm-gateway). 게이트웨이의 "429 시 자동 폴백"은 게이트웨이 자체가 보유한 여러 프로바이더/무료 API 사이의 별개 라우팅이지 구독 한도를 우회하는 기능이 아니다. 우회하려면 구독이 아닌 별도 API 키로 완전히 전환해야 하는데 이는 Anthropic 정책상 크레덴셜 중개·수집 금지 조항과 근접해 ToS 저촉 소지가 있다(code.claude.com/docs/en/legal-and-compliance). 한도 도달 시엔 리셋을 기다리거나 플랜을 조정한다. **이 금지는 한도 우회 목적에 한한다 — 토큰 절약(입력 압축·출력 축약) 목적의 로컬 도구·프록시는 해당하지 않는다(2026-11-17 사용자 결정).** 허용 조건은 아래 "토큰 절약 팩"을 따른다.
 
 ## 전역 코어 (2026-08-17 설치, 2026-10-02·2026-11-17 갱신 — 설치 여부는 상태 열 기준)
 
@@ -21,7 +21,7 @@
 | Figma MCP | MCP (디자인→코드) | 연결됨 (claude.ai 커넥터). 무료(Starter) 플랜은 도구 호출 월 20회 한도 (Figma 공식 rate-limits 문서, 2026-10-02 확인) |
 | Lazyweb MCP | MCP (UI 레퍼런스 검색 — 실제 서비스 화면·플로우) | **미설치** — 사용자가 lazyweb.com 계정으로 토큰을 발급한 뒤 등록: `claude mcp add --transport http --scope user lazyweb https://www.lazyweb.com/mcp --header "Authorization: Bearer <token from ~/.lazyweb/lazyweb_mcp_token>"` (lazyweb.com/claude.md 원문). 무료 판정 F2 — MCP 사용은 무료, 비Pro 계정은 리포트 일부만. 원격 `install.sh`를 바로 실행하는 설치 방식 사용 금지, 프로젝트 기밀 정보(목표·회사명 등) 입력 금지, 토큰 git 커밋 금지 |
 | claude-mem | 플러그인 (세션 메모리 지속성) | 설치됨 (`claude-mem install` 완료) |
-| ponytail | 플러그인 (YAGNI·최소 코드 강제) | 설치됨 (full 모드) |
+| ponytail (`DietrichGebert/ponytail`) | 플러그인 (YAGNI·최소 코드 강제). MIT, 무료 판정 F1. 스킬 6개 + 훅 3개(SessionStart·SubagentStart·UserPromptSubmit), MCP 없음 | 설치됨 (2026-11-17, v5.3.3, user 스코프 — `claude plugin marketplace add DietrichGebert/ponytail` → `claude plugin install ponytail@ponytail`). 이전 표기 "설치됨 (full 모드)"는 2026-11-17 실측에서 설치 흔적이 없어 정정했다. 강도는 설치 기본값이며 `/ponytail`로 확인·변경한다. 상시 비용 약 641토큰/세션(`claude plugin details` 추정치). 선택 설정 4개(작업 보드·웹훅 주소·웹훅 토큰·작업명 전송)는 미설정 — 웹훅을 켜면 작업 정보가 외부로 나가므로 켜기 전에 사용자가 결정한다. **주의**: ① 같은 이름의 다른 플러그인이 여럿 있다 — 이 저장소 것만 설치 ② `/ponytail-review`·`/ponytail-audit`은 이 킷의 reviewer·QA 판정(치명/권고 2단계)을 대신하지 않는다 ③ 훅이 서브에이전트에도 규칙을 주입하므로, 최소 코드 지시가 PRD 승인 기준·DoD와 부딪히면 PRD·DoD가 이긴다 |
 | Agent Reach (`Panniantong/Agent-Reach`) | CLI + 스킬 (유튜브 자막·GitHub·웹 읽기·검색, 읽기 전용. MCP 아님 — MCP 개수 한도에 세지 않는다). MIT, 무료 판정 F1 | 설치됨 (2026-11-17, v1.6.1, `uv tool install https://github.com/Panniantong/Agent-Reach/releases/latest/download/agent-reach.zip` → `agent-reach setup`). 스킬이 `~/.agents/skills`·`~/.claude/skills`·`~/.gemini/skills`·`~/.copilot/skills` 네 곳에 놓인다. 실측 `agent-reach check` 15개 중 13개 통과(실패 2건은 bilibili). X·Reddit 채널은 미추가(`agent-reach add <채널>` + 본인 로그인 필요). **주의**: ① PyPI의 `agent-reach`는 다른 패키지다 — pip로 설치 금지 ② 사용자 폴더명이 한글이면 `setup`·`add`가 경로 인코딩 오류로 실패한다 — `PYTHONUTF8=1`을 설정하고 실행 ③ 웹 읽기·검색은 Jina·Exa를 경유하므로 비공개 주소·민감한 검색어를 넣지 않는다 ④ 공개 내용은 도구 내장 검색·읽기를 먼저 쓰고 안 될 때만 쓴다. 이 행의 버전·통과 수·스킬 위치는 설치한 PC에서 잰 값이라 저장소만으로는 재현되지 않는다 — 재확인: 버전 `agent-reach version`, 채널 실측 `agent-reach check --text`, 스킬 위치 `agent-reach skill`, 라이선스 `gh api repos/Panniantong/Agent-Reach --jq .license.spdx_id`, PyPI 주의는 Agent-Reach 저장소의 설치 안내 문서(install.md) 첫머리 경고 |
 | 스킬 7종 | frontend-design, theme-factory, brainstorming, taste-skill, animate, impeccable, ui-ux-pro-max(CLI만, 프로젝트별 `uipro init`) | `~/.claude/skills` 설치됨. impeccable만 `~/.agents/skills/`에도 설치돼 안티그래비티에서도 잡힌다. **`~/.codex/skills/`는 비어 있다 (2026-08-18 실측) — Codex에서는 이 스킬들이 전부 없는 상태다** |
 
@@ -73,6 +73,16 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | 공식 /security-review | Claude Code 내장 — 설치 불요 |
 | trailofbits/skills (CodeQL·Semgrep 감사 12종+) | `/plugin marketplace add trailofbits/skills` |
 | SonarQube MCP (품질 게이트) | 계정 필요, Docker |
+| cloudflare/security-audit-skill (다중 에이전트 심층 보안 감사 — 정찰·탐색·후보 검증·구조화 출력·독립 재검증·보고 6단계, 발견마다 별도 에이전트가 반증 시도) | `npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit` (프로젝트 설치. 2026-11-17 README 확인, MIT, 무료 판정 F1). **주의**: ① 스킬 이름이 이 킷의 공용 스킬 `security-audit`과 같다 — 프로젝트 `.claude/skills/security-audit/`에는 킷의 연결 파일이 이미 있으므로 덮어쓰지 않게 설치 위치·이름 충돌을 먼저 확인한다(충돌 시 동작 미확인) ② 서브에이전트를 여러 개 띄워 토큰 소모가 크다(추정) — 병합 전 리뷰마다가 아니라 출시 전·보안 요구가 큰 변경에만 쓴다 ③ 산출물(`findings.json`, `REPORT.md` 등)의 등급은 이 킷의 치명/권고 2단계로 다시 매겨 reviewer·QA 보고에 넣는다 ④ 킷의 `security-audit` 체크리스트와 DoD 게이트를 대신하지 않는다 |
+
+### 토큰 절약 팩 (선택 — 2026-11-17 사용자 결정으로 허용, 현재 미설치)
+
+**허용 범위: 절약 목적만.** 구독 사용량 한도를 넘기려는 용도, 다른 프로바이더로 요청을 돌리는 용도는 위 "금지" 절 그대로 금지다. 설치 전에 아래 조건을 확인한다.
+
+| 항목 | 정체 | 허용 조건·주의 |
+|---|---|---|
+| caveman (`JuliusBrussee/caveman`) | 응답 축약 스킬 + 입력 축소·모델 자동 선택 등을 묶은 CLI. Apache-2.0 (2026-11-17 README 확인) | ① **스킬만 쓰는 구성을 기본으로 한다** — README가 프록시 없는 스킬 단독 설치를 따로 안내한다 ② "Auto"(모델 자동 선택)는 쓰지 않는다 — 로그인하면 요청 내용과 첨부 파일(CLAUDE.md·메모리 등)이 운영사 서버로 전송된다고 README가 밝힌다. 이는 절약이 아니라 요청 라우팅이다 ③ CLI는 기본으로 사용 통계(명령·토큰 수·설치 ID·OS·IP)를 보낸다 — 설치 전에 끄는 방법을 확인한다(미확인) ④ **보고 템플릿·근거 표기·축어 인용 의무가 축약보다 우선한다** — 축약 때문에 표의 열·근거·`미검증` 표시가 빠지면 끈다. 서브에이전트 보고와 문서 작성에는 적용하지 않는다 ⑤ 절감 수치는 자체 측정값이다 — 도입 시 같은 과제로 전후를 재서 이 표에 적는다 |
+| headroom (`headroomlabs-ai/headroom`) | 도구 출력·로그·파일을 모델에 보내기 전에 압축하는 로컬 프록시·라이브러리·MCP. Apache-2.0 (2026-11-17 GitHub API 확인) | ① 로컬에서만 동작하는 구성으로 쓴다(README: 데이터가 로컬에 머문다 — 실측 미확인) ② `headroom wrap claude`는 세션 단위 프록시다 — 구독 로그인 상태에서 정상 동작하는지와 한도 계산이 그대로인지 도입 시 실측한다(미확인) ③ `headroom learn`은 쓰지 않거나 대상을 `CLAUDE.local.md`로만 둔다 — AGENTS.md·CLAUDE.md를 직접 고치는 기능이라 문서 소유권과 부딪힌다 ④ MCP로 붙이면 MCP 개수 한도에 센다 ⑤ 압축 때문에 근거(로그 원문·파일 줄)가 잘려 보이면 원문을 다시 읽어 확인한다 — 검증 증거 보존은 압축 전 원본으로 한다 ⑥ 절감 수치(JSON 60~95%, 코딩 에이전트 20%)는 저장소 설명의 자체 수치다 |
 
 ### 구현 보조 팩 (대형 코드베이스·TDD 강제 시)
 
@@ -104,6 +114,7 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | 항목 | 정체 | 쓰는 시점·주의 |
 |---|---|---|
 | public-apis (`public-apis/public-apis`) | 공개 API 링크 목록 — README 표 형식(API·설명·Auth·HTTPS·CORS), 2026-11-17 기준 표 행 약 2,480개, MIT, 무료 판정 F1 (GitHub API 실측). 재확인 방법: 라이선스·최종 푸시·보관 여부는 `gh api repos/public-apis/public-apis --jq '{license:.license.spdx_id,pushed_at,archived}'`, 행 수는 `gh api repos/public-apis/public-apis/readme --jq .content`를 base64로 풀어 세로선과 대괄호로 시작하는 표 행을 `grep -c`로 센 값(광고·예시 행이 섞일 수 있어 "약") | 설계 단계에서 외부 API 후보를 찾을 때 README를 열어 본다. 설치·복제하지 않는다. 목록에 있다는 것이 무료·안정성을 보장하지 않는다 — 채택 전에 해당 API의 요금·호출 한도·약관을 직접 확인하고 architect가 docs/Architecture.md에 근거를 기록한다. API 키가 필요하면 "시크릿 관리" 절을 따른다 |
+| claude-code-best-practice (`shanraisshan/claude-code-best-practice`) | Claude Code 기능별(워크플로·훅·MCP·플러그인·설정·상태 줄 등) 모범 사례와 예제 파일 모음. MIT (2026-11-17 GitHub API 확인), 무료 판정 F1 | 킷 자체를 점검·개선할 때(docs/HarnessAudit.md를 돌릴 때, KitFeedback 대기 행을 처리할 때) 비교 기준으로 읽는다. 설치·복제하지 않는다. 저장소의 예제 설정·훅을 그대로 복사하지 않는다 — 이 킷의 가드 훅·문서 소유권과 맞는지 확인한 뒤 필요한 부분만 KitFeedback 절차로 반영한다. Claude Code 전용 내용이라 Codex·안티그래비티에는 해당 없음 |
 
 ## 판정 규칙 (새 프로젝트 시작 시)
 

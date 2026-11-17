@@ -17,7 +17,7 @@
 3. docs/Architecture.md (기존 내용)
 4. docs/DECISIONS.md, docs/adr/
 5. docs/CodingRules.md
-6. docs/UpdateRequests.md (architect가 담당으로 지목된 열린 행이 있는지 확인)
+6. docs/UpdateRequests.md (architect가 담당으로 지목된 열린 행이 있는지 확인), docs/Lessons.md (이번 작업과 영역이 겹치는 `유효` 행 — 규칙이 아니라 참고 자료)
 7. `.agents/skills/clean-architecture/SKILL.md` (계층 구조·의존성 역전·DTO 경계 기준), 보안 요구가 있으면 `.agents/skills/security-audit/SKILL.md`
 
 ## 절차

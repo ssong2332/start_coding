@@ -42,15 +42,46 @@
 | 7 | 2026-11-17 | start_coding (외부 스킬 대조 검증) | Claude Code | 읽기 전용 Bash 명령이 `차단: 훅/서명을 우회하는 git 플래그 (git commit -n)`으로 막혔다. 명령에 실제 `git commit`은 없었고 git 명령은 끝의 `git status --short && git branch --show-current`뿐이었다. 명령 발췌(중간 생략): `for p in ... "git-workflow-and-versioning\|36\|own commit"; do ...; sed -n "${l}p" "$file" \| cut -c1-140; done ... cd $K && git status --short && git branch --show-current` — 스킬 이름 속 `git`, 검색어 속 `commit`, `sed -n`의 `-n`이 한 명령 문자열에 함께 있었다. 우회하지 않고 같은 확인을 Grep 도구로 수행했다 | `.claude/hooks/block-no-verify.js:32` → `.claude/hooks/lib/shell-args.js`의 `findCommitNoVerifyShortFlag` (같은 날 가상 입력으로 재현함 — 최소 명령 `echo "own commit"; sed -n 3p file.txt; git status --short`도 exit 2로 차단된다. `shell-args.js` 안의 어느 줄이 일치시키는지는 미확인) | `-n` 판정을 "같은 단순 명령 안에서 `git` 실행 파일 뒤 하위 명령이 `commit`일 때"로 좁힌다 — 따옴표 안 문자열, 다른 명령(`sed`·`grep`)의 인자, `;`·`&&`·파이프로 나뉜 다른 명령은 제외. 재현 케이스를 훅 회귀 테스트에 추가 | 대기 |
 | 8 | 2026-11-17 | start_coding (외부 스킬 대조 검증) | Claude Code | 7번 행의 보충 — 7번은 막힌 명령을 발췌로만 실었다(판정표는 "명령 원문 포함"을 요구). 차단된 명령 원문(사용자 홈 경로만 `<홈>`·`<스크래치패드>`로 가림, 그 외 무편집): `S="<스크래치패드>/agent-skills"; K=~/start_coding; ls "$S" \| head -40; echo "files=$(ls "$S" \| wc -l)"; f(){ find "$S" -iname "*$1*" \| head -1; }; echo "--- 외부 인용"; for p in "interview-me\|211\|batching" "code-review-and-quality\|183\|severity" "ci-cd-and-automation\|279\|env.test" "test-driven-development\|246\|Over-mocking" "constraint-driven-development\|140\|AGENTS.md" "debugging-and-error-recovery\|38\|in order" "git-workflow-and-versioning\|36\|own commit"; do IFS='\|' read n l k <<< "$p"; file=$(f "$n"); printf "%s:%s => " "$n" "$l"; sed -n "${l}p" "$file" \| cut -c1-140; done; echo "--- 킷 줄"; sed -n '18p;14p;17p' $K/.agents/skills/idea-interview/SKILL.md \| cut -c1-120; sed -n '8p;32p' $K/.agents/roles/reviewer.role.md \| cut -c1-120; sed -n '9p;21p;46p' $K/docs/GitWorkflow.md \| cut -c1-120; sed -n '46p' $K/.agents/skills/tdd-practitioner/SKILL.md \| cut -c1-120; sed -n '36p' $K/docs/ToolPacks.md \| cut -c1-80; wc -l $K/.agents/skills/security-audit/SKILL.md; grep -rn -i -E "SSRF\|STRIDE\|bisect\|eslint-disable" $K --include=*.md -l 2>/dev/null \| grep -v node_modules \| head; cd $K && git status --short && git branch --show-current` (원문은 줄바꿈으로 나뉜 여러 줄이며 여기서는 `;`로 이었다) | 7번 행과 같음 | 7번 행과 같음 | 대기 (7번과 함께 처리) |
 
-상태값: `대기` (템플릿에 미반영) / `반영됨` (템플릿 커밋 해시 함께) / `기각` (사유 한 줄).
+상태값: `대기` (템플릿에 미반영) / `반영됨` (템플릿 커밋 해시 함께) / `기각` (사유 한 줄). 값 뒤에 부가 설명(커밋 해시, 성공 신호, 함께 처리할 행 번호)을 붙일 수 있다.
 
 ## 템플릿에 반영하는 절차 (start_coding 리포에서)
 
 1. 각 프로젝트의 `docs/KitFeedback.md`에서 `대기` 행을 모은다.
 2. 같은 증상이 2개 이상 프로젝트에서 나왔으면 우선 처리한다 — 1회성은 그 프로젝트 특성일 수 있다.
-3. 고친 뒤 `node .claude/hooks/contract-check.js --report`로 새 모순이 생기지 않았는지 확인한다.
-4. 규칙 문구를 바꿨으면 **옛 문구를 리포 전체에서 검색해 잔존분을 함께 고친다** (문구 하나가 여러 문서에 흩어져 있다).
-5. 반영 후 원래 행의 상태를 `반영됨 + 커밋 해시`로 갱신한다.
+3. 행마다 아래 "어떤 형태로 고칠 것인가" 표로 고칠 형태와 위치를 정한다.
+4. 고친 뒤 `node .claude/hooks/contract-check.js --report`로 새 모순이 생기지 않았는지 확인한다.
+5. 규칙 문구를 바꿨으면 **옛 문구를 리포 전체에서 검색해 잔존분을 함께 고친다** (문구 하나가 여러 문서에 흩어져 있다).
+6. 반영 후 원래 행의 상태를 `반영됨 + 커밋 해시`로 갱신한다.
+
+## 어떤 형태로 고칠 것인가 (템플릿 리포에서 대기 행을 처리할 때)
+
+대기 행마다 아래 표를 위에서부터 적용해 **처음 맞는 형태**로 고친다. 아래로 갈수록 이후 모든 세션이 읽어야 할 양이 늘어난다.
+
+| 순서 | 형태 | 맞는 경우 | 예 |
+|---|---|---|---|
+| 1 | 없애기·바로잡기 | 마찰의 원인이 낡았거나 틀렸거나 아무 일도 하지 않는 규칙·문구다. 검사가 이미 덮는 규칙도 여기에 해당한다 | 틀린 경로·명령 수정, 중복 조항 삭제 |
+| 2 | 검사 | 실수의 모양이 일정해서 도구가 잡을 수 있다 | contract-check 항목, 훅 회귀 케이스, check-syntax |
+| 3 | 가리키기 | 필요한 내용이 이미 있는데 에이전트가 못 찾았다 | 에이전트가 먼저 보는 문서에 경로 한 줄 |
+| 4 | 판정 기준 한 줄 | 리뷰어가 diff에서 볼 수 있고 도구로는 못 잡는다 | reviewer 검토 순서, CodingRules |
+| 5 | 새 규칙 | 위 넷이 모두 안 맞을 때만 | AGENTS.md 조항 |
+
+같은 실수가 반복되는 행은 **가장 일찍 막는 형태**를 고른다: 원인 제거 → 실수하는 순간 걸리는 검사 → 피하라는 안내 순.
+
+### 어디에 둘 것인가
+
+| 위치 | 넣는 것 | 비용 |
+|---|---|---|
+| 항상 읽히는 문서 (AGENTS.md) | 모든 세션에 필요한 규칙과 경로만 | 모든 세션, 모든 턴 |
+| 역할 원본 (.agents/roles/) | 그 역할만 지켜야 하는 것 | 그 역할이 호출될 때 |
+| 필요할 때 읽는 문서 (.agents/skills/, docs/) | 절차·체크리스트 같은 상세 | 그 작업을 할 때만 |
+
+5번(새 규칙)을 항상 읽히는 문서에 넣으려면, 같은 증상이 **2개 이상 프로젝트**에서 나왔거나(위 절차 2번) 한 번이라도 세션 밖으로 피해가 나간 경우(잘못된 커밋, 데이터 손실, 시크릿 노출)여야 한다. 그 외에는 필요할 때 읽는 문서에 둔다. 이 문턱은 5번에만 적용한다 — 1~3번은 값이 싸므로 한 번만 나와도 고친다.
+
+### 성공 신호
+
+고칠 때 "고쳐졌다면 다음에 무엇이 보이는가"를 한 줄 정한다 — 명령이 더 이상 실패하지 않는다, 검사가 그 실수를 잡는다, 같은 행이 다시 추가되지 않는다. 관찰할 수 없는 수정은 나중에 효과를 판정할 수 없다. 신호는 행의 상태 열에 `반영됨 ({커밋}) — 신호: …`로 덧붙인다.
+
+(이 절의 형태 순서·위치·성공 신호는 `EveryInc/compound-engineering-plugin`의 `ce-retro`(MIT)에서 가져와 이 킷 규칙에 맞춰 다시 썼다 — 2026-11-17.)
 
 ## 반대 방향: 마스터 갱신을 진행 중 프로젝트로 가져오는 법
 

@@ -20,7 +20,7 @@
 4. docs/CodingRules.md
 5. docs/GitWorkflow.md
 6. docs/DefinitionOfDone.md
-7. docs/Tasks.md (담당 작업 ID 확인)
+7. docs/Tasks.md (담당 작업 ID 확인), docs/Lessons.md (이번 작업과 영역이 겹치는 `유효` 행 — 규칙이 아니라 참고 자료)
 8. `.agents/skills/tdd-practitioner/SKILL.md` (테스트 작성 절차·기준), `.agents/skills/clean-architecture/SKILL.md` (계층·DTO 경계), `.agents/skills/security-audit/SKILL.md` (입력 검증·시크릿), 웹 UI 작업이면 `.agents/skills/web-performance/SKILL.md`
 9. 웹 UI 작업이면 docs/ToolPacks.md "웹 프론트엔드 팩"·전역 코어의 아래 선택 항목 중 이 환경에 설치된 것을 함께 참고한다. 이들은 `.agents/skills/`가 아니라 Claude Code 전용 선택 설치 항목이라 다른 도구 세션에서는 해당 없음이고, Claude Code에서도 모든 프로젝트에 항상 있는 게 아니다 — 설치 안 된 항목은 해당 없음(임의 설치 금지 — 설치가 필요하면 문서 갱신 권고에 적는다)
    - 스킬: `web-design-guidelines`, `emilkowalski/skills`(animate·review-animations·improve-animations·find-animation-opportunities·emil-design-eng)
@@ -51,5 +51,5 @@ AGENTS.md의 검증 증거 보존과 화면 검증 도구 실패 처리 규칙�
 | E2E 회귀 | n/m 통과 / 해당 없음 | {이전 n/m 또는 —} | {명령 원문 + 덮은 핵심 흐름, 또는 "해당 없음 — 사유"} |
 | 남긴 화면 | URL·상태 | — | {사용자가 이어서 볼 수 있게 남긴 화면, 없으면 "해당 없음 — 사유"} |
 | DoD | 통과/미통과 항목 | — | docs/DefinitionOfDone.md |
-### 문제/다음 단계: {막힌 것, 문서 갱신 권고 — 없으면 "없음"}
+### 문제/다음 단계: {막힌 것, 문서 갱신 권고, docs/Lessons.md 자격에 해당하면 `교훈 후보:` 한 줄(틀렸던 가정·안 통한 시도·실제 원인) — 없으면 "없음"}
 ```

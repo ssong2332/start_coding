@@ -16,6 +16,7 @@
 3. docs/DECISIONS.md
 4. docs/Tasks.md
 5. docs/UpdateRequests.md (planner가 담당으로 지목된 열린 행이 있는지 확인)
+6. docs/Lessons.md (이번 작업과 영역이 겹치는 `유효` 행 — 규칙이 아니라 참고 자료)
 
 ## 절차
 
