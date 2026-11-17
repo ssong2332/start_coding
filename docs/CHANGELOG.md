@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Added
+- 2026-11-17 `docs/ToolPacks.md` 콘텐츠·영상·마케팅 팩에 marketingskills 행(`coreyhaines31/marketingskills` — 마케팅 작업 지침 스킬): 전역(user 스코프) 설치됨(사용자 지시 — "marketingskills 설치·등록"), `claude plugin marketplace add coreyhaines31/marketingskills` → `claude plugin install marketing-skills@marketingskills`, v2.14.12, 스킬 53개, MIT(조사 에이전트 보고 — 인용). 설치본에 훅·MCP 정의 파일 없음(마켓플레이스 폴더에서 `hooks*.json`·`.mcp.json` 검색 0건). 주의: 스킬 설명문 합계 약 18,800자가 모든 세션에 상시 로드되므로 마케팅 작업이 없는 기간에는 `claude plugin disable marketing-skills@marketingskills`로 끔(토큰 수는 계측하지 않음), 파트너 서비스 연동 안내 스킬은 가입·키 입력 전에 사용자 확인, 6-에이전트 파이프라인에서는 쓰지 않음
 - 2026-11-17 `docs/ToolPacks.md` "참고 자료" 절에 "디자인·콘텐츠 참고 사이트" 카테고리 표(일러스트·폰트·아이콘·UI 컴포넌트·인터랙션·애니메이션·3D 에셋·이미지·영상·컬러 팔레트·목업·영상 프롬프트 모음 — 10개 카테고리). 설치 대상 아님, 사이트별 라이선스(출처 표기·유료 구간·상업 이용)는 등록 시점에 미확인으로 명시. 영상 프롬프트 모음에 awesome-opus5-5-videos(사용자가 말한 "amazing opus 5.5 videos"와 같은 것인지는 이름 유사성뿐이라 추정으로 표기)
 - 2026-11-17 `docs/ToolPacks.md` 새 절 "콘텐츠·영상 팩 (개인용 — 킷의 개발 파이프라인 밖)" 4행: ① hyperframes v0.9.60 전역 설치(사용자 결정 — 영상 도구는 remotion 대신 이것 하나로), 렌더용 FFmpeg 9.0.2를 `winget install --id Gyan.FFmpeg --exact`로 설치(사용자 지시, 설치 전 열린 셸은 재시작 필요), 텔레메트리 비컨은 2026-11-17 기준 끄지 않은 상태로 기록 ② brag v0.6.0 전역 설치(조사 판정 "조건부"), Opus 5.5·Sonnet 5.5·Fable 5.2에서는 `/brag`가 `brag-slim`으로 자동 전환되며 hyperframes 렌더는 `/brag --full` ③ ppt-master는 기존 `pptx` 스킬과 6장 실측 비교 후 미도입(토큰 약 2배, 파이썬 패키지 95개, 3D 모델 삽입 기능은 문서에서 찾지 못함) ④ 3D 발표 자료: PowerPoint 365로 3D 모델(GLB) 삽입·모핑 경로 확인, 발표 화면 재생은 미검증, Blender는 미설치
 - 2026-11-17 `docs/ToolPacks.md` 웹 프론트엔드 팩에 전역(user 스코프) 설치 4건 반영: emil-design-eng(emilkowalski/skills 20개 중 이것만, 나머지 3개는 미설치), shadcn 공식 스킬(`shadcn-ui/ui`의 `skills/shadcn`), GSAP 공식 스킬(`greensock/gsap-skills`, 8종 설치 후 같은 날 gsap-frameworks 1종 제거해 현재 7종), 21st.dev 플러그인 v0.4.1(스킬 7개 + 원격 MCP 1개, 상시 약 1,513토큰). 같은 저장소의 `apple-design`·`migrate-radix-to-base`는 설치하지 않음으로 기록
@@ -33,6 +34,7 @@
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
+- 2026-11-17 `docs/ToolPacks.md` 절 제목 "콘텐츠·영상 팩 (개인용 — 킷의 개발 파이프라인 밖)"을 "콘텐츠·영상·마케팅 팩 (개인용 — 킷의 개발 파이프라인 밖)"으로 변경(marketingskills 행 추가에 따름). 아래 Added의 이전 항목에 적힌 옛 절 제목은 당시 기록이라 그대로 둠
 - 2026-11-17 `docs/ToolPacks.md` "3D 발표 자료" 행: 판정을 "PPT Master + Blender 조합 도입 기각"으로 명시(사용자 결정 — "기존으로도 3d ppt가 가능하면 도입 기각"). 기존 도구(PowerPoint 365 16.0.20527 + 기존 `pptx` 스킬)로 3D 모델 삽입·정적 렌더까지 확인했으므로 새로 설치하지 않음, 발표 재생은 미검증 유지. 판단 기준은 삽입·정적 렌더 수준이며, 기각 범위는 ppt-master 도입과 이 용도의 Blender 상시 설치 — 모델을 직접 만들 때 Blender를 따로 설치하는 것은 그때 판단(c880c54, 48aa501). 위 Added의 "콘텐츠·영상 팩" 항목 ④("경로 확인", Blender 미설치)는 그대로 유효하며 이 항목이 판정을 덧붙인다
 - 2026-11-17 `.agents/roles/architect.role.md` 절차 7번: 시각적 완성도는 설계 대상이 아니지만 모션·UI 라이브러리를 쓸지와 무엇을 쓸지(GSAP·Framer Motion·shadcn 등 또는 CSS만)는 설계 대상으로 Architecture 스택 표에 적고, 표에 없는 라이브러리는 구현 단계 스킬이 추천해도 쓰지 않음을 명시(2026-11-17 사용자 결정: 모션 설계 분담은 역할 문서에 명시)
 - 2026-11-17 `.agents/roles/implementer.role.md` 사전 읽기 9번: `gsap-*`·`shadcn` 스킬은 Architecture 스택 표에 해당 라이브러리가 있을 때만 쓴다는 불릿과 "모션·UI의 분담" 불릿 추가 — 라이브러리 선택은 스택 표(architect), 스킬 설명문의 특정 라이브러리 추천(GSAP 추천, 21st 먼저 검색)은 스택 표에 없으면 따르지 않음, 모션 배치는 implementer가 스킬로 구현하고 판단은 사용자 화면 확인, 보고에 모션을 화면·요소별로 적음
