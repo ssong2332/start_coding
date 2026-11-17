@@ -35,7 +35,7 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 | 기획 | docs/PRD.md, docs/Tasks.md | 사용자 승인 |
 | 설계 | docs/Architecture.md, docs/DECISIONS.md, docs/adr/ | 사용자 승인 |
 | 구현 | 소스 코드 | docs/DefinitionOfDone.md 체크리스트 전부 통과 (Tasks "검증중" 항목은 예외 — DoD 머리글의 예외 조항) |
-| 리뷰 | 리뷰 보고서 (파일 수정 없음) | 치명 결함 0건 |
+| 리뷰 | 리뷰 보고서 (파일 수정 없음) | 치명 결함 0건 (재검증이 `미확정`인 치명 후보도 치명으로 센다 — `.agents/roles/reviewer.role.md`) |
 | 검증 | 테스트 보고서 (실행 출력 포함) | 정의된 테스트 전부 실행·통과 |
 | 문서화 | README.md, docs/CHANGELOG.md 갱신 | 이번 변경분 반영 완료 |
 
