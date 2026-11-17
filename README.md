@@ -43,7 +43,7 @@ bash scripts/init.sh "프로젝트명"
 ├── .agents/skills/    # 공용 스킬 원본 (안티그래비티·Codex 직접 사용)
 ├── .agents/scripts/   # .agents cwd에서 기존 안티그래비티 가드를 호출하는 진입점
 ├── .claude/agents/    # 6-에이전트 연결 파일 (도구 권한·모델만 정의, 본문은 .agents/roles/)
-├── .claude/skills/    # Claude Code의 공용 스킬 연결 파일 + 전용 스킬 cli-delegate(Codex·안티그래비티 위임)
+├── .claude/skills/    # Claude Code의 공용 스킬 연결 파일 + 전용 스킬 cli-delegate(Codex·안티그래비티 위임)·app-subsession(앱 서브 세션)
 ├── .claude/hooks/     # 강제 가드 3종 + 안티그래비티 위임 확인 훅(confirm-agy-delegate.js, Claude Code 전용) + 정합성 검사 (가드는 Claude Code·Codex 공유)
 ├── .codex/agents/     # 6-에이전트 연결 파일 (Codex 전용, 본문은 .agents/roles/)
 ├── .codex/EXECUTION.md # Codex 실행 출력·세션 수집 안내
@@ -56,7 +56,7 @@ bash scripts/init.sh "프로젝트명"
 
 ## 개발 파이프라인
 
-아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조. 각 단계를 메인 세션과 서브에이전트 중 누가 수행하는지는 [AGENTS.md의 "메인 세션과 서브에이전트 구분" 절](AGENTS.md#메인-세션과-서브에이전트-구분)을 따른다. 별도 세션이 필요한 작업은 앱 서브 세션(생성·보고·검증·제공·정리, 정리는 보관이 기본)으로 맡기며 규칙은 같은 절의 "앱 서브 세션" 하위 절에 있다.
+아이디어 인터뷰 → 기획 → 설계 → 구현 → 리뷰/검증 → 문서화. 단계별 산출물과 게이트는 [AGENTS.md](AGENTS.md) 참조. 각 단계를 메인 세션과 서브에이전트 중 누가 수행하는지는 [AGENTS.md의 "메인 세션과 서브에이전트 구분" 절](AGENTS.md#메인-세션과-서브에이전트-구분)을 따른다. 별도 세션이 필요한 작업은 앱 서브 세션(생성·보고·검증·제공·정리, 정리는 보관이 기본)으로 맡기며 규칙은 `.claude/skills/app-subsession/SKILL.md`에 있다(AGENTS.md에는 한 줄 참조만 남음). 진행 중 요구사항 변경의 분류 표는 `.agents/roles/planner.role.md`에 있고 AGENTS.md에는 원칙만 있다.
 
 인터뷰는 아이디어를 받아 적는 단계가 아니라 **같이 설계하는 대화**다: 개인/팀·언어·배포·기능 범위 등 빈칸을 질문으로 채우고, 선택지마다 추천 방향과 반대 방향을 함께 제시하며, 사용자가 "완성"을 선언할 때까지 계속된다. 절차는 [.agents/skills/idea-interview/SKILL.md](.agents/skills/idea-interview/SKILL.md).
 
