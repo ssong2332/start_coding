@@ -33,6 +33,7 @@
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
+- 2026-11-17 `docs/ToolPacks.md` "3D 발표 자료" 행: 판정을 "PPT Master + Blender 조합 도입 기각"으로 명시(사용자 결정 — "기존으로도 3d ppt가 가능하면 도입 기각"). 기존 도구(PowerPoint 365 16.0.20527 + 기존 `pptx` 스킬)로 3D 모델 삽입·정적 렌더까지 확인했으므로 새로 설치하지 않음, 발표 재생은 미검증 유지. 판단 기준은 삽입·정적 렌더 수준이며, 기각 범위는 ppt-master 도입과 이 용도의 Blender 상시 설치 — 모델을 직접 만들 때 Blender를 따로 설치하는 것은 그때 판단(c880c54, 48aa501). 위 Added의 "콘텐츠·영상 팩" 항목 ④("경로 확인", Blender 미설치)는 그대로 유효하며 이 항목이 판정을 덧붙인다
 - 2026-11-17 `.agents/roles/architect.role.md` 절차 7번: 시각적 완성도는 설계 대상이 아니지만 모션·UI 라이브러리를 쓸지와 무엇을 쓸지(GSAP·Framer Motion·shadcn 등 또는 CSS만)는 설계 대상으로 Architecture 스택 표에 적고, 표에 없는 라이브러리는 구현 단계 스킬이 추천해도 쓰지 않음을 명시(2026-11-17 사용자 결정: 모션 설계 분담은 역할 문서에 명시)
 - 2026-11-17 `.agents/roles/implementer.role.md` 사전 읽기 9번: `gsap-*`·`shadcn` 스킬은 Architecture 스택 표에 해당 라이브러리가 있을 때만 쓴다는 불릿과 "모션·UI의 분담" 불릿 추가 — 라이브러리 선택은 스택 표(architect), 스킬 설명문의 특정 라이브러리 추천(GSAP 추천, 21st 먼저 검색)은 스택 표에 없으면 따르지 않음, 모션 배치는 implementer가 스킬로 구현하고 판단은 사용자 화면 확인, 보고에 모션을 화면·요소별로 적음
 - 2026-11-17 `docs/ToolPacks.md` GSAP 스킬 행: "8종"을 "7종"으로 정정(gsap-frameworks를 같은 날 제거 — 사용자 결정, `npx skills remove -g -a claude-code -s gsap-frameworks`), 8종 설치 사실과 통설치 비해당 판정 근거(단일 목적 저장소) 유지, 분담은 architect·implementer 역할 원본 참조 안내 추가
