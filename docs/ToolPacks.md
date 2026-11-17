@@ -136,13 +136,14 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 |---|---|---|
 | 일러스트 | undraw, storyset, drawkit | 빈 상태·온보딩·랜딩 화면에 넣을 그림이 필요할 때 |
 | 폰트 | fontshare, fonts in use, typepair | 서체 선택·조합을 정할 때. fonts in use·typepair는 내려받는 곳이 아니라 사용 사례·조합 참고용 |
-| 아이콘 | lordicon, icons8 | 아이콘이 필요할 때. 스택에 아이콘 라이브러리가 이미 있으면 그것을 먼저 쓴다 |
-| UI 컴포넌트 | 21st.dev, magic ui, react bits | React 프로젝트에서 컴포넌트 예제를 찾을 때. 21st.dev는 "웹 프론트엔드 팩"에 플러그인으로 등록돼 있다. 나머지 둘은 코드를 복사해 오는 방식이라 의존성을 확인한다 |
+| 아이콘 | lordicon, icons8, svgl.app, icon.museum | 아이콘이 필요할 때. 스택에 아이콘 라이브러리가 이미 있으면 그것을 먼저 쓴다. svgl.app은 브랜드 로고 SVG 모음(상표라 로고 사용 규정을 따로 확인), icon.museum은 앱 아이콘 갤러리라 내려받는 곳이 아니라 참고용 |
+| UI 컴포넌트 | 21st.dev, magic ui, react bits, kexsio.com | React 프로젝트에서 컴포넌트 예제를 찾을 때. 21st.dev는 "웹 프론트엔드 팩"에 플러그인으로 등록돼 있다. 나머지는 코드를 복사해 오는 방식이라 의존성을 확인한다 |
 | 인터랙션·애니메이션 | design spells, framer | 모션 사례를 찾을 때. 구현 방법은 "웹 프론트엔드 팩"의 모션 스킬이 맡는다 |
 | 3D 에셋 | getlayers, spline | 3D 요소가 필요할 때. spline은 런타임 스크립트를 싣는 방식이라 성능 영향을 확인한다(`.agents/skills/web-performance/SKILL.md`) |
 | 이미지·영상 | unsplash, pexels, lummi | 자리 표시용·배경용 사진과 영상이 필요할 때 |
 | 컬러 팔레트 | coolors, color hunt, realtime colors | 색 조합을 정할 때. 대비는 접근성 기준으로 따로 확인한다 |
-| 목업 | shots, mockuuups, previewed | README·소개 자료용 기기 목업 이미지를 만들 때 |
+| 목업 | shots, mockuuups, previewed, app-mockup.com | README·소개 자료용 기기 목업 이미지를 만들 때. app-mockup.com은 앱스토어 스크린샷 디자인용 |
+| 웹사이트 레퍼런스 | inspo.page(접속 시 details.so/inspo로 이동), brandlogo.co, admiretheweb.com, umanmade.com | 화면 구성·UI 패턴·브랜드 로고·모션 사례를 둘러볼 때. 실제 서비스 화면·플로우 검색은 Lazyweb MCP(위 전역 코어)가 맡는다 |
 | 영상 프롬프트 모음 | awesome-opus5-5-videos (`yihui-dev/awesome-opus5-5-videos` — 목록의 "amazing opus 5.5 videos"와 같은 것인지는 이름이 가장 가깝다는 근거뿐이라 추정) | 영상 제작 프롬프트 사례를 찾을 때. 프롬프트를 복사해 쓰는 읽을거리다. 미리보기 링크가 제3자 사이트로 연결된다 |
 
 ## 판정 규칙 (새 프로젝트 시작 시)
