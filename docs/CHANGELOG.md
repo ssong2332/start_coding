@@ -21,9 +21,17 @@
 - 2026-10-27 implementer·QA 보고 템플릿에 "남긴 화면" 행 추가
 - 2026-10-27 AGENTS.md 검증 루프에 "화면 흐름 회귀" 행 — 웹 UI의 PRD 핵심 사용자 흐름은 E2E 회귀 테스트를 Red-First로 두고, 세션 중 실물 확인과 서로 대신하지 않음(러너를 쓰지 않으면 사유를 Architecture에 기록)
 - 2026-10-27 docs/DefinitionOfDone.md에 웹 UI E2E 회귀 항목 추가
+- 2026-11-17 공용 스킬 `.agents/skills/root-cause-debugging/SKILL.md`(원인 진단 절차: 재현 → 위치 좁히기 → 최소화 → 근본 수정 → 재발 방지, 인과 사슬 확인, 재현 불가 분기표)와 Claude 연결 파일 `.claude/skills/root-cause-debugging/SKILL.md`. AGENTS.md 공용 스킬 표에 행 추가
+- 2026-11-17 `docs/Lessons.md` — 검증된 틀린 가정·안 통한 시도 기록(행 추가는 메인 세션만, 자격·형태는 문서 안). AGENTS.md 문서 소유권 표에 행, 문서 우선순위 밖 문서임을 명시. planner·architect·implementer·reviewer 역할 원본이 `유효` 행을 참고 자료로 읽고, implementer·QA·reviewer 보고 템플릿에 `교훈 후보:` 전달 칸 추가
+- 2026-11-17 `docs/KitFeedback.md`에 "어떤 형태로 고칠 것인가"(5단계 판정표)·"어디에 둘 것인가"·"성공 신호" 절과 대기 행 7·8(Bash 가드 `git commit -n` 오탐)
+- 2026-11-17 `docs/ToolPacks.md`: "토큰 절약 팩" 절(절약 목적 한정 허용 조건 — 현재 도입한 항목 없음, caveman은 미도입으로 표기), 보안 팩에 cloudflare/security-audit-skill, "참고 자료 (설치 대상 아님)" 절(public-apis, claude-code-best-practice), 전역 코어에 Agent Reach 행
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
+- 2026-11-17 `docs/ToolPacks.md`: LLM 게이트웨이 금지 문구에 "한도 우회 목적에 한한다 — 토큰 절약 목적의 로컬 도구·프록시는 해당하지 않는다(2026-11-17 사용자 결정)" 추가. ponytail 행을 실설치 기준(v5.3.3, 이전 "설치됨 (full 모드)" 표기는 설치 흔적이 없어 정정)으로 갱신, debugger 대체 행에 root-cause-debugging 편입 반영
+- 2026-11-17 implementer·QA·reviewer 역할 원본: 같은 실패 2회 후 원인 분석을 root-cause-debugging 스킬로 연결 (QA·reviewer는 1~3단계 진단까지만). 스킬의 추정 원인 처리에 "서브에이전트는 보고하고 종료하며 승인을 기다리며 멈춰 있지 않는다" 보완
+- 2026-11-17 `docs/KitFeedback.md`: 상태값에 부가 설명을 붙일 수 있게 하고 반영 절차에 형태 판정 단계 추가
+- 2026-11-17 README: 구조의 docs/ 설명에 Lessons.md 추가
 - 2026-10-27 역할 단일 원본을 `.agents/roles/*.role.md`로 통합 — `.claude/agents/*.md`와 `.codex/agents/*.toml`은 원본을 가리키는 연결 파일로 축소
 - 2026-10-27 `.codex/EXECUTION.md`·`.agents/skills/vibe-mode/SKILL.md`·`docs/ToolPacks.md`·`docs/KitFeedback.md` 갱신, AGENTS.md 문서 소유권 표에 새 경로 반영
 - 2026-10-27 `.claude/hooks/contract-check.js` C5 플레이스홀더 검사가 `.claude/worktrees/`를 제외
