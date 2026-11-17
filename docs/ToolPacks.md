@@ -111,12 +111,38 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | oh-my-mermaid (코드베이스 다이어그램) | `npm i -g oh-my-mermaid && omm setup` |
 | mermaid-skill (다이어그램 23종) | 스킬 폴더 복사 |
 
+### 콘텐츠·영상 팩 (개인용 — 킷의 개발 파이프라인 밖)
+
+| 항목 | 설치 |
+|---|---|
+| hyperframes (`heygen-com/hyperframes` — HTML/CSS 애니메이션을 영상으로 렌더하는 도구. 소개·출시 영상을 만들 때만) | **전역 설치됨 (2026-11-17, 사용자 결정 — 영상 도구는 remotion 대신 이것 하나로)** — `claude plugin marketplace add heygen-com/hyperframes` → `claude plugin install hyperframes@hyperframes`. v0.9.60, user 스코프, 스킬 9개. 조사 시점 기준 Apache-2.0·코어는 키 불필요·로컬 렌더(README 서술을 조사 에이전트가 읽은 값 — 스크립트 본문은 확인하지 않음). **주의**: ① 렌더에 FFmpeg가 필요하다 — 2026-11-17 `winget install --id Gyan.FFmpeg --exact`로 9.0.2 설치(사용자 지시, 사용자 PATH에 등록됨 — 설치 전에 열린 셸·세션은 재시작해야 `ffmpeg`가 잡힌다) ② 마켓플레이스 저장소의 파일 86개 이상이 Git LFS 포인터로만 내려왔다(설치 시 경고) — 예제 에셋이 필요하면 경고문이 알려 준 `git lfs pull`을 실행한다 ③ `hyperframes auth login`·공유·HeyGen 생성 기능(`media-use` 스킬의 아바타·음성 등)은 외부 서비스로 내용을 보내고 유료 구간이 있다 — 쓰기 전에 사용자에게 확인한다 ④ 스킬 설명문이 모든 세션에 상시 로드된다. 킷의 6-에이전트 파이프라인에서는 쓰지 않는다 ⑤ hyperframes 스킬 3종(hyperframes·hyperframes-cli·media-use)은 시작할 때 사용량 비컨(`npx hyperframes events`)을, 렌더 뒤 평가(`feedback --rating`)를 보낸다고 스킬 문서에 적혀 있다(조사 에이전트가 로컬 SKILL.md에서 확인 — 인용). 끄려면 `npx hyperframes telemetry disable` 또는 환경 변수 `HYPERFRAMES_NO_TELEMETRY=1` — 2026-11-17 기준 끄지 않은 상태 |
+| brag (`latent-spaces/brag` — 프로젝트 폴더를 읽어 출시 영상 `brag.mp4`·기획·공유 문구를 `brag-output/`에 만든다) | **전역 설치됨 (2026-11-17, 사용자 지시 — 조사 판정 "조건부")** — `claude plugin marketplace add latent-spaces/brag` → `claude plugin install brag@brag`. v0.6.0, user 스코프, 스킬 2개(brag·brag-slim). 조사 결과(인용): MIT(번들 음원은 CC BY 4.0 — 영상 게시 때 표기 의무), 훅·MCP·권한 변경 없음, 업로드·API 호출 코드 없음. **주의**: ① Opus 5.5·Sonnet 5.5·Fable 5.2에서 `/brag`는 hyperframes를 쓰지 않는 `brag-slim`으로 자동 전환된다 — hyperframes로 렌더하려면 `/brag --full`(또는 `--voice`) ② `--full`·`--voice`는 위 hyperframes 텔레메트리가 함께 돈다 — 쓰기 전에 끈다 ③ `.env` 등 비밀 파일 제외는 스킬의 프롬프트 지시일 뿐 물리 차단이 아니다(이 킷에서는 `block-env-access.js`가 막는다) ④ 쓰는 프로젝트의 `.gitignore`에 `brag-output*/`가 있는지 확인한다 ⑤ 인증이 필요한 내부·스테이징 URL을 입력으로 주지 않는다 — 내부 화면이 공개 영상에 실릴 수 있다 ⑥ slim이 빠진 도구를 받아 오겠다고 물으면 전역 설치 대신 `npx -y`·`uv run --with` 같은 임시 실행을 고른다 |
+| ppt-master (`hugohe3/ppt-master` — SVG를 작성해 PowerPoint 네이티브 도형으로 바꾸는 발표 자료 스킬) | **미도입 (2026-11-17 실측 비교 후)** — 같은 원고 6장으로 기존 `pptx` 스킬과 비교했다(결과물 `.artifacts/ppt-eval/`, Git 추적 제외). 두 결과 모두 PowerPoint 렌더에서 글자 넘침·겹침 없음. ppt-master는 사용 토큰 약 2배(약 36.6만 대 18.6만), 설치 파이썬 패키지 95개, 기본 결과의 차트·표가 네이티브 개체가 아닌 도형 묶음(옵션을 줘야 네이티브). 3D 기능도 없다(문서에 "3D — perspective, extrusion, and shear fail closed" — 조사 에이전트 인용). 겉모습 차이는 취향 수준이라 교체 근거가 없다고 판정. 원고 1건·사용자 확인 단계를 건너뛴 실행이라 일반화하지 않는다 |
+| 3D 발표 자료 (PowerPoint 3D 모델 + 모핑 전환, 필요하면 Blender로 모델 제작) | **설치 없음 — 이 PC의 PowerPoint 365(16.0.20527)로 가능함을 확인 (2026-11-17)**. 덱 본문은 기존 `pptx` 스킬로 만들고, `.glb` 모델은 PowerPoint COM `Shapes.Add3DModel`로 넣는다. 시험: 직접 만든 정육면체 GLB를 삽입 → 모델 개체(Type 30)로 들어가고 `ppt/media/model3d1.glb`·`am3d:model3d` 생성, 회전값을 바꾼 복제 슬라이드에 모핑(EntryEffect 3953)을 걸어 PNG로 렌더 확인(`.artifacts/ppt-eval/3d-test/`). 발표 화면에서의 모핑 재생은 눈으로 보지 않았다(미검증). **주의**: ① 2025-03-01부터 FBX·SKP 신규 삽입 지원 종료, GLB·GLTF·OBJ·STL은 유지(MS 공지 MC950892 — 인용) ② 웹 PowerPoint는 3D 삽입 불가·재생만 ③ Blender에서 내보낸 애니메이션 GLB는 첫 프레임만 보인다는 보고가 있어, 움직임은 PowerPoint의 Turntable·Swing 효과나 모핑으로 낸다 ④ Blender(winget `BlenderFoundation.Blender`, 조사 시점 5.3.0)는 모델을 직접 만들 때만 설치한다 — 미설치 ⑤ AI가 Blender를 조작하는 `ahujasid/blender-mcp`는 임의 Python 실행·무인증 로컬 소켓 위험이 있어 쓰려면 사용자 승인을 따로 받는다 |
+
 ## 참고 자료 (설치 대상 아님)
 
 | 항목 | 정체 | 쓰는 시점·주의 |
 |---|---|---|
 | public-apis (`public-apis/public-apis`) | 공개 API 링크 목록 — README 표 형식(API·설명·Auth·HTTPS·CORS), 2026-11-17 기준 표 행 약 2,480개, MIT, 무료 판정 F1 (GitHub API 실측). 재확인 방법: 라이선스·최종 푸시·보관 여부는 `gh api repos/public-apis/public-apis --jq '{license:.license.spdx_id,pushed_at,archived}'`, 행 수는 `gh api repos/public-apis/public-apis/readme --jq .content`를 base64로 풀어 세로선과 대괄호로 시작하는 표 행을 `grep -c`로 센 값(광고·예시 행이 섞일 수 있어 "약") | 설계 단계에서 외부 API 후보를 찾을 때 README를 열어 본다. 설치·복제하지 않는다. 목록에 있다는 것이 무료·안정성을 보장하지 않는다 — 채택 전에 해당 API의 요금·호출 한도·약관을 직접 확인하고 architect가 docs/Architecture.md에 근거를 기록한다. API 키가 필요하면 "시크릿 관리" 절을 따른다 |
 | claude-code-best-practice (`shanraisshan/claude-code-best-practice`) | Claude Code 기능별(워크플로·훅·MCP·플러그인·설정·상태 줄 등) 모범 사례와 예제 파일 모음. MIT (2026-11-17 GitHub API 확인), 무료 판정 F1 | 킷 자체를 점검·개선할 때(docs/HarnessAudit.md를 돌릴 때, KitFeedback 대기 행을 처리할 때) 비교 기준으로 읽는다. 설치·복제하지 않는다. 저장소의 예제 설정·훅을 그대로 복사하지 않는다 — 이 킷의 가드 훅·문서 소유권과 맞는지 확인한 뒤 필요한 부분만 KitFeedback 절차로 반영한다. Claude Code 전용 내용이라 Codex·안티그래비티에는 해당 없음 |
+
+### 디자인·콘텐츠 참고 사이트 (2026-11-17 등록, 카테고리별)
+
+모두 웹사이트나 읽을거리라 설치할 것이 없다. **사이트별 라이선스(출처 표기 의무·유료 구간·상업 이용 조건)는 등록 시점에 확인하지 않았다(미확인)** — 에셋을 프로젝트에 넣기 전에 해당 사이트의 약관을 직접 확인하고, 출처 표기가 필요하면 README에 적는다. 에셋·컴포넌트가 Architecture 스택 표에 없는 패키지를 요구하면 implementer 역할 원본의 "외부 패키지 임의 설치 금지"가 그대로 적용된다.
+
+| 카테고리 | 사이트 | 쓰는 시점·주의 |
+|---|---|---|
+| 일러스트 | undraw, storyset, drawkit | 빈 상태·온보딩·랜딩 화면에 넣을 그림이 필요할 때 |
+| 폰트 | fontshare, fonts in use, typepair | 서체 선택·조합을 정할 때. fonts in use·typepair는 내려받는 곳이 아니라 사용 사례·조합 참고용 |
+| 아이콘 | lordicon, icons8 | 아이콘이 필요할 때. 스택에 아이콘 라이브러리가 이미 있으면 그것을 먼저 쓴다 |
+| UI 컴포넌트 | 21st.dev, magic ui, react bits | React 프로젝트에서 컴포넌트 예제를 찾을 때. 21st.dev는 "웹 프론트엔드 팩"에 플러그인으로 등록돼 있다. 나머지 둘은 코드를 복사해 오는 방식이라 의존성을 확인한다 |
+| 인터랙션·애니메이션 | design spells, framer | 모션 사례를 찾을 때. 구현 방법은 "웹 프론트엔드 팩"의 모션 스킬이 맡는다 |
+| 3D 에셋 | getlayers, spline | 3D 요소가 필요할 때. spline은 런타임 스크립트를 싣는 방식이라 성능 영향을 확인한다(`.agents/skills/web-performance/SKILL.md`) |
+| 이미지·영상 | unsplash, pexels, lummi | 자리 표시용·배경용 사진과 영상이 필요할 때 |
+| 컬러 팔레트 | coolors, color hunt, realtime colors | 색 조합을 정할 때. 대비는 접근성 기준으로 따로 확인한다 |
+| 목업 | shots, mockuuups, previewed | README·소개 자료용 기기 목업 이미지를 만들 때 |
+| 영상 프롬프트 모음 | awesome-opus5-5-videos (`yihui-dev/awesome-opus5-5-videos` — 목록의 "amazing opus 5.5 videos"와 같은 것인지는 이름이 가장 가깝다는 근거뿐이라 추정) | 영상 제작 프롬프트 사례를 찾을 때. 프롬프트를 복사해 쓰는 읽을거리다. 미리보기 링크가 제3자 사이트로 연결된다 |
 
 ## 판정 규칙 (새 프로젝트 시작 시)
 
