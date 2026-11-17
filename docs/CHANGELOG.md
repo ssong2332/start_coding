@@ -7,8 +7,8 @@
 ### Added
 - 2026-11-17 공용 스킬 `.agents/skills/root-cause-debugging/SKILL.md`(원인 진단 절차: 재현 → 위치 좁히기 → 최소화 → 근본 수정 → 재발 방지, 인과 사슬 확인, 재현 불가 분기표)와 Claude 연결 파일 `.claude/skills/root-cause-debugging/SKILL.md`. AGENTS.md 공용 스킬 표에 행 추가
 - 2026-11-17 `docs/Lessons.md` — 검증된 틀린 가정·안 통한 시도 기록(행 추가는 메인 세션만, 자격·형태는 문서 안). AGENTS.md 문서 소유권 표에 행, 문서 우선순위 밖 문서임을 명시. planner·architect·implementer·reviewer 역할 원본이 `유효` 행을 참고 자료로 읽고, implementer·QA·reviewer 보고 템플릿에 `교훈 후보:` 전달 칸 추가
-- 2026-11-17 `docs/KitFeedback.md`에 "어떤 형태로 고칠 것인가"(5단계 판정표)·"어디에 둘 것인가"·"성공 신호" 절과 대기 행 7·8(Bash 가드 `git commit -n` 오탐)
-- 2026-11-17 `docs/ToolPacks.md`: "토큰 절약 팩" 절(절약 목적 한정 허용 조건 — 현재 도입한 항목 없음, caveman은 미도입으로 표기), 보안 팩에 cloudflare/security-audit-skill, "참고 자료 (설치 대상 아님)" 절(public-apis, claude-code-best-practice), 전역 코어에 Agent Reach 행
+- 2026-11-17 `docs/KitFeedback.md`에 "어떤 형태로 고칠 것인가"(5단계 판정표)·"어디에 둘 것인가"·"성공 신호" 절과 행 7·8(Bash 가드 `git commit -n` 오탐 — 2026-11-17 사용자 결정으로 기각, 회피는 git 명령과 `-n` 옵션 명령을 별도 호출로 나눔)
+- 2026-11-17 `docs/ToolPacks.md`: "토큰 절약 팩" 절(절약 목적 한정 허용 조건 — 현재 도입한 항목 없음, caveman은 미도입으로 표기), 보안 팩에 cloudflare/security-audit-skill, "참고 자료 (설치 대상 아님)" 절(public-apis, claude-code-best-practice), 전역 코어에 Agent Reach 행, 구현 보조 팩에 graphify 행(설치·전역 등록됨 v0.9.111, 이 킷 저장소 실측 — 노드 505·연결 1,059, 문서 추출에 약 51만 6천 토큰, 전역 설치가 `~/.claude/CLAUDE.md`에 등록 블록을 덧붙이는 점, 갱신 주기는 "작업 완료 시마다" 수동 `/graphify . --update` — 사용자 확정, AGENTS.md에는 미반영이라 강제 아님)
 - 2026-10-27 Claude 전용 스킬 `.claude/skills/cli-delegate/SKILL.md` — Codex·안티그래비티에 작업을 넘기는 CLI 위임 절차(프롬프트는 파일·stdin으로 전달)
 - 2026-10-27 AGENTS.md "다른 도구 세션과의 핸드오프" 절 — `.artifacts/handoff/{작업ID}/{실행ID}/`의 prompt.md·report.md 규칙, 메인 오케스트레이터는 Claude Code 세션임을 명시
 - 2026-10-27 `.codex/DEVELOPMENT.md`, `.codex/FRONTEND.md`(Codex 개발 보조·UI 지침), `.codex/tests/adapters.test.cjs`(연결 파일·훅 배선 검사)
@@ -28,7 +28,7 @@
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
-- 2026-11-17 `docs/ToolPacks.md`: LLM 게이트웨이 금지 문구에 "한도 우회 목적에 한한다 — 토큰 절약 목적의 로컬 도구·프록시는 해당하지 않는다(2026-11-17 사용자 결정)" 추가. ponytail 행을 실설치 기준(v5.3.3, 이전 "설치됨 (full 모드)" 표기는 설치 흔적이 없어 정정)으로 갱신, debugger 대체 행에 root-cause-debugging 편입 반영
+- 2026-11-17 `docs/ToolPacks.md`: LLM 게이트웨이 금지 문구에 "한도 우회 목적에 한한다 — 토큰 절약 목적의 로컬 도구·프록시는 해당하지 않는다(2026-11-17 사용자 결정)" 추가. ponytail 행을 실설치 기준(v5.3.3, 이전 "설치됨 (full 모드)" 표기는 설치 흔적이 없어 정정)으로 갱신, debugger 대체 행에 root-cause-debugging 편입 반영. 판정 규칙 "코드베이스 10k줄 이상" 행의 기본 도구를 Serena에서 graphify로 변경(Serena는 대안, 둘 중 하나만 사용 — 2026-11-17 사용자 결정)
 - 2026-11-17 implementer·QA·reviewer 역할 원본: 같은 실패 2회 후 원인 분석을 root-cause-debugging 스킬로 연결 (QA·reviewer는 1~3단계 진단까지만). 스킬의 추정 원인 처리에 "서브에이전트는 보고하고 종료하며 승인을 기다리며 멈춰 있지 않는다" 보완
 - 2026-11-17 `docs/KitFeedback.md`: 상태값에 부가 설명을 붙일 수 있게 하고 반영 절차에 형태 판정 단계 추가
 - 2026-11-17 README: 구조의 docs/ 설명에 Lessons.md 추가
