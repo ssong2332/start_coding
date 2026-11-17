@@ -51,7 +51,7 @@ bash scripts/init.sh "프로젝트명"
 ├── .codex/tests/      # Codex 연결 파일·훅 배선 검사
 ├── .codex/hooks.json  # Codex 배선 (최초 1회 /hooks 신뢰 승인 필요)
 ├── .agents/hooks.json # 안티그래비티 배선 → cwd별 scripts/agy-guard.js 진입점
-└── .artifacts/        # 로컬 증거 (Git 제외): verification/ 검증 로그, handoff/ 다른 도구 세션과의 prompt.md·report.md
+└── .artifacts/        # 로컬 증거 (Git 제외): verification/ 검증 로그, handoff/ 다른 도구 세션과의 prompt.md·report.md, learn-mode/ 학습 모드 진도 상태
 ```
 
 ## 개발 파이프라인
