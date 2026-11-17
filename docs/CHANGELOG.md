@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Added
+- 2026-11-17 하네스 비교 조사의 부분 차용 후보 3건 반영(사용자 지시: "1·3·4 반영"). `.agents/skills/tdd-practitioner/SKILL.md`에 "유효하지 않은 Red" 표(테스트 0개·로드 오류·러너 비정상 종료·무관한 테스트만 실패·구현 전 통과는 Red로 인정하지 않음, Red 증거에 실패 이름·메시지가 "기대 동작 없음"을 가리키는지 한 줄 기록 — gsd-core `gate-tdd-red-evidence` 판정 기준의 개념 차용). `.agents/roles/implementer.role.md`에 7항 "리뷰·QA 지적을 받아 반영할 때" 추가(지적을 코드·테스트·요구사항과 대조해 맞으면 Red→수정→Green, 틀리면 반증 근거를 보고, 판단 불가면 확인할 것을 보고 — superpowers `receiving-code-review` 절차의 개념 차용)
 - 2026-11-17 학습 모드(learn-mode): 공용 스킬 `.agents/skills/learn-mode/SKILL.md`(사용자가 설계를 먼저 말하고 AI가 피드백·개념 설명·합의된 구현을 맡는 진행 방식, `nykooi1/vibe-wise`(MIT)의 행동 규칙 차용 — 사용자 지시: "grill-me는 개념만 차용하고 vibewise도 행동 규칙을 주입해서 유사한 경험을 하도록 진행"), Claude 연결 파일 `.claude/skills/learn-mode/SKILL.md`. 사용자가 명시적으로 켰을 때만 시작, 상태 파일은 `.artifacts/learn-mode/`(profile·progress·project-map). AGENTS.md 공용 스킬 표에 행, 문서 소유권 표에 `.artifacts/learn-mode/` 행(메인 세션이 생성·갱신)
 - 2026-11-17 `.claude/hooks/learn-mode-session.js` SessionStart 주입 훅 — `.artifacts/learn-mode/profile.md`에 `Learning mode: active`가 있으면 세션 시작·재개·압축 때 스킬과 상태 파일을 읽으라는 안내를 넣음(차단·쓰기 없음), `.claude/settings.json`에 배선, 회귀 검사 `.claude/hooks/test-learn-mode.js`, `.claude/hooks/README.md` 훅 표에 행
 - 2026-11-17 learn-mode 스킬 끝에 "출처와 라이선스 고지" 절 — `nykooi1/vibe-wise`(`skills/learn/behavior.md`·`onboarding.md`·`state-templates.md`·`hooks/session_start.py`)를 한국어로 옮기고 고친 것임을 밝히고 원본 MIT 라이선스 고지문(Copyright (c) 2026 Noah Kim) 전문 수록. `learn-mode-session.js` 머리 주석에도 MIT 표기와 고지문 위치 추가
@@ -38,6 +39,8 @@
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
+- 2026-11-17 `.agents/roles/reviewer.role.md`: 정확성 단계에 "테스트가 실제로 지키는가" 관점 추가(바뀐 동작마다 망가지면 실패할 테스트가 있는지 — 테스트 없음·바뀐 동작을 건드리지 않음·무력함 구분), 새 4항 "지적 재검증"(`실재`/`반증`/`미확정`, 반증된 지적은 "반증된 후보" 목록으로 — BMAD-METHOD `bmad-code-review` triage 단계의 개념 차용), 심각도 판정은 4항에서 5항으로, 결함 표에 "재검증" 열 추가(이전: 5열 `# | 심각도 | 파일:줄 | 지적 | 재현`, 이후: 6열)
+- 2026-11-17 `.agents/roles/qa.role.md`와 `docs/DefinitionOfDone.md` Red-First 항목: 보존된 Red가 tdd-practitioner "유효하지 않은 Red" 표에 해당하면 DoD Red-First 항목을 미통과로 판정(이전: 실패 여부만 대조)
 - 2026-11-17 AGENTS.md 기획 착수 조건에 학습 모드 예외 추가 — 사용자가 학습 모드(`.agents/skills/learn-mode/SKILL.md`)를 켰으면 설계 성격 항목은 사용자 접근을 먼저 묻고, 추천·반대는 사용자가 도움을 청하거나 막혔을 때 줌(인터뷰 필수·서브에이전트 위임 금지 문구는 그대로)
 - 2026-11-17 `.claude/hooks/learn-mode-session.js` 판정 보강 — 파일 앞 BOM 제거, `Learning mode:` 첫 번째 표시 줄의 값만 기준(본문에 같은 문구가 또 있어도 무시, `active` 외 값은 무동작), `.artifacts`·`learn-mode`·`profile.md` 세 경로 모두 링크·정션이면 무시(이전: `profile.md` 파일 링크만 검사)
 - 2026-11-17 learn-mode 스킬 단계별 표 "구현" 행: 학습 모드는 구현 체크포인트마다 사용자 승인이 필요하므로 여러 파일에 걸친 기능이어도 메인 세션 직접 구현 행이 "여러 파일·모듈에 걸친 기능 구현" 행보다 우선한다는 근거 추가
