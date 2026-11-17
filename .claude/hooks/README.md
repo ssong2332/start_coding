@@ -34,7 +34,7 @@
 
 | 파일 | 종류 | 무엇을 막는가 |
 |---|---|---|
-| `block-main-writes.js` | 가드 | main/master 체크아웃 상태의 `git commit`, 다른 브랜치를 main에 직접 써넣는 refspec push |
+| `block-main-writes.js` | 가드 | main/master 체크아웃 상태의 `git commit`, 다른 브랜치를 main에 직접 써넣는 refspec push. 브랜치와 무관하게 되돌릴 수 없는 git 명령(`reset --hard`, `clean -f`, `branch -D`·`-d -f`, 강제 push — `--force-with-lease`는 허용, `checkout .`, `restore .` — `--staged`만이면 허용)도 차단한다. 판정은 `lib/destructive-git.js`이고 안티그래비티 `scripts/agy-guard.js`도 같은 모듈을 쓴다(mattpocock/skills git-guardrails 개념 차용 — 원본의 push 전체 차단은 병합 후 push 흐름과 충돌해 제외). 문자열 검사라 `echo` 안의 언급도 막는다(안전 쪽 오탐) |
 | `block-no-verify.js` | 가드 | `--no-verify`, `--no-gpg-sign`, 훅 우회 config |
 | `block-env-access.js` | 가드 | 실제 `.env` 읽기·수정·출력·덮어쓰기 (`.env.example`은 허용) |
 | `confirm-agy-delegate.js` | 확인 훅 | 차단하지 않는다. `agy … --dangerously-skip-permissions` 실행이면 `permissionDecision: "ask"`로 매번 사용자 확인 창을 띄운다 (Claude Code에만 배선) |

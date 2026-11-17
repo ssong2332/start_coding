@@ -31,6 +31,15 @@ try {
   };
 }
 
+// 되돌릴 수 없는 git 명령 판정도 Claude 가드와 같은 모듈을 쓴다. 모듈이 없으면 가드 전체가
+// 죽지 않도록 이 검사만 건너뛴다(fail-open — 나머지 검사는 그대로 동작).
+let findDestructiveGit = () => null;
+try {
+  ({ findDestructiveGit } = require(path.join(__dirname, "..", ".claude", "hooks", "lib", "destructive-git.js")));
+} catch {
+  /* 모듈 없음 — 이 검사만 생략 */
+}
+
 function main() {
   let input = "";
   process.stdin.setEncoding("utf8");
@@ -107,6 +116,16 @@ function main() {
             output({
               decision: "deny",
               reason: `[GitWorkflow] 훅/서명을 우회하는 git 플래그(${skipHit})가 차단되었습니다.`
+            });
+            return;
+          }
+
+          // 2-2b. 되돌릴 수 없는 git 명령 (.claude/hooks/block-main-writes.js 와 같은 lib/destructive-git.js)
+          const destructive = findDestructiveGit(command);
+          if (destructive) {
+            output({
+              decision: "deny",
+              reason: `[GitWorkflow] ${destructive} — 되돌릴 수 없는 git 명령은 에이전트가 실행하지 않습니다. 필요하면 사용자에게 직접 실행을 요청하세요.`
             });
             return;
           }

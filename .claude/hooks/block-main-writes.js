@@ -2,6 +2,8 @@
 // PreToolUse 가드 (Bash): main/master 체크아웃 상태의 `git commit`과,
 // 다른 브랜치를 병합 없이 main/master ref에 직접 써넣는 refspec push를 차단한다.
 // docs/GitWorkflow.md("main 직접 커밋 금지, main은 병합으로만 갱신")를 강제한다.
+// 브랜치와 무관하게 되돌릴 수 없는 git 명령(reset --hard, clean -f, branch -D, 강제 push,
+// checkout ./restore .)도 차단한다 — 판정은 lib/destructive-git.js.
 //
 // 의도적으로 막지 않는 것: main에서의 평범한 `git push` / `git push origin main`.
 // 병합을 마친 사용자·메인 세션의 정상적인 마지막 단계이기 때문이다(docs/GitWorkflow.md 병합 절).
@@ -11,10 +13,18 @@
 // 한계: 브랜치 판정은 명령 실행 전 HEAD 기준이다. `git checkout main && git commit`
 // 같은 복합 명령은 판정을 비껴간다 — 명령을 나눠 실행할 것(.claude/hooks/README.md).
 const { readHookInput } = require("./lib/read-hook-input");
+const { findDestructiveGit } = require("./lib/destructive-git");
 
 readHookInput((payload) => {
   const command = payload?.tool_input?.command;
   if (typeof command !== "string") process.exit(0);
+
+  // 되돌릴 수 없는 git 명령은 브랜치와 무관하게 막는다 — 필요하면 사용자가 직접 실행한다.
+  const destructive = findDestructiveGit(command);
+  if (destructive) {
+    console.error(`차단: ${destructive} — 되돌릴 수 없는 git 명령은 에이전트가 실행하지 않는다. 필요하면 사용자에게 직접 실행을 요청할 것.`);
+    process.exit(2);
+  }
 
   // Windows는 실행 파일 이름 대소문자를 가리지 않는다(GIT.EXE도 git) — 재리뷰 권고 5
   // git(.exe) 뒤 ["']? 는 "C:\Program Files\Git\cmd\git.exe" commit 처럼 따옴표 감싼 전체 경로 — f8fed91 재리뷰 권고 1
