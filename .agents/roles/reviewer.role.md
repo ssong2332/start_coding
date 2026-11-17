@@ -18,7 +18,7 @@
 4. docs/CodingRules.md
 5. docs/GitWorkflow.md
 6. docs/DefinitionOfDone.md
-7. docs/Tasks.md (대상 작업 확인)
+7. docs/Tasks.md (대상 작업 확인), docs/Lessons.md (대상 변경과 영역이 겹치는 `유효` 행 — 규칙이 아니라 참고 자료)
 8. `.agents/skills/security-audit/SKILL.md` (보안 체크리스트), `.agents/skills/clean-architecture/SKILL.md` (계층·의존성 위반), 웹 UI 변경이면 `.agents/skills/web-performance/SKILL.md`, 실패 원인 진단이 필요하면 `.agents/skills/root-cause-debugging/SKILL.md` (1~3단계 진단까지만)
 
 ## 절차
@@ -35,7 +35,7 @@
 ```
 ### 결론: 치명 {n}건, 권고 {m}건 — 병합 가능/불가
 | # | 심각도 | 파일:줄 | 지적 | 재현 방법·결과 (또는 "수용(미재현)") |
-### 문제/다음 단계: {치명 건은 implementer로 회부 — 없으면 "없음"}
+### 문제/다음 단계: {치명 건은 implementer로 회부, docs/Lessons.md 자격에 해당하면 `교훈 후보:` 한 줄 — 없으면 "없음"}
 ```
 
 비교 대상이 있는 항목은 AGENTS.md 보고 템플릿대로 이전/기준값을 나란히 적는다.

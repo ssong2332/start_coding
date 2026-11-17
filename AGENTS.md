@@ -252,6 +252,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | docs/CHANGELOG.md | docs | 읽기 전용 |
 | docs/ToolPacks.md | 사용자 | 읽기 전용 (설치 팩 카탈로그) |
 | docs/KitFeedback.md | 사용자 | 행 추가는 사용자 또는 메인 세션만 (6-에이전트는 소유 문서 외 수정 금지 규칙에 따라 불가 — 보고서로 전달) — 기존 행 수정 금지(상태 열 제외) |
+| docs/Lessons.md | 사용자 | 행 추가는 메인 세션만 (6-에이전트는 보고서의 `교훈 후보:`로 전달) — 기존 행 수정 금지(상태 열 제외). 자격·형태·절차는 그 문서에 있다 |
 | .claude/hooks/, .claude/settings.json | 사용자 | 읽기 전용 — 차단을 우회하려고 편집하는 대상이 아니다 |
 | .agents/hooks.json, .agents/scripts/, scripts/agy-guard.js, scripts/check-syntax.js, scripts/test-agy-hook-cwd.js | 사용자 | 읽기 전용 (안티그래비티 강제 계층·실행 진입점·구문 및 훅 회귀 검사) — 우회 목적 편집 금지 |
 | .codex/hooks.json | 사용자 | 읽기 전용 (Codex 강제 계층) — 우회 목적 편집 금지 |
@@ -303,6 +304,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 13. docs/UpdateRequests.md (README·CHANGELOG처럼 파생 문서에서 나온 요청이라 이 문서가 원본 스펙 문서와 부딪힐 일은 없다 — 있으면 원본이 이긴다)
 
 (docs/KitFeedback.md는 우선순위에 없다 — 이 프로젝트의 규칙이 아니라 템플릿에 대한 기록이므로 현재 작업의 판단 근거가 되지 않는다.)
+(docs/Lessons.md도 우선순위에 없다 — 규칙이 아니라 이 프로젝트에서 검증된 과거 사실의 기록이다. 작업 전 참고 자료로 읽되, 위 문서와 어긋나면 위 문서가 이긴다.)
 (docs/HarnessAudit.md도 우선순위에 없다 — 파이프라인 산출물이 아니라 하네스 편집 후 수동으로 도는 체크리스트다. 상세는 해당 문서와 `.claude/hooks/README.md`.)
 
 ## 킷 자체의 문제 기록
