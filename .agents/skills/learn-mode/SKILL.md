@@ -74,7 +74,7 @@ AGENTS.md 보고 템플릿에 더해 **무엇을 어디서 바꿨는지, 핵심 
 |---|---|
 | 아이디어 인터뷰 | 요구사항·취향 질문은 idea-interview 그대로. **설계 성격의 항목(언어·스택, 데이터, 인증, 화면 구조)**은 추천·반대를 먼저 내지 않고 사용자 접근을 먼저 묻는다 — 사용자가 도움을 청하거나 막히면 그때 idea-interview의 추천·반대 형식으로 준다 |
 | 기획·설계 (planner·architect) | 사용자의 설계 결정을 원문 그대로 인용해 넘긴다(축어 전달 의무). architect는 그것을 뒤집지 않고 기록하며, 위험·빈틈은 Open Questions로 올린다. 승인 게이트는 그대로 |
-| 구현 | 메인 세션이 직접 구현한다(AGENTS.md "메인 세션과 서브에이전트 구분"의 "중간에 사용자 질문이 필요할 가능성이 큰 작업" 행). implementer 역할 원본의 금지·TDD·증거 보존 의무는 그대로 |
+| 구현 | 메인 세션이 직접 구현한다(AGENTS.md "메인 세션과 서브에이전트 구분"의 "중간에 사용자 질문이 필요할 가능성이 큰 작업" 행). 학습 모드에서는 구현 체크포인트마다 사용자 승인이 필요하므로, 여러 파일에 걸친 기능이어도 이 행이 "여러 파일·모듈에 걸친 기능 구현" 행보다 우선한다. implementer 역할 원본의 금지·TDD·증거 보존 의무는 그대로 |
 | 리뷰·검증·문서화 | 변화 없음. 결과를 사용자에게 전할 때 무엇이 지적됐고 왜인지 설명을 곁들인다 |
 | vibe 모드와 함께 | 함께 켤 수 있다 — vibe 모드가 게이트를 줄이고, 학습 모드는 결정을 사용자에게 둔다 |
 
@@ -84,3 +84,31 @@ AGENTS.md 보고 템플릿에 더해 **무엇을 어디서 바꿨는지, 핵심 
 |---|---|
 | Claude Code | `.claude/settings.json`의 SessionStart 훅(`.claude/hooks/learn-mode-session.js`)이 `profile.md`가 active면 세션 시작·재개·압축 때 이 스킬과 상태 파일을 읽으라는 안내를 넣는다. 훅은 파일을 읽어 판단만 하고 아무것도 쓰지 않는다 |
 | Codex·안티그래비티 | 자동 주입 없음. 사용자가 "학습 모드로 이어서"라고 하면 이 파일과 상태 파일을 직접 읽는다 |
+
+## 출처와 라이선스 고지
+
+이 스킬의 진행 규칙과 `.claude/hooks/learn-mode-session.js`의 판단 방식은 `nykooi1/vibe-wise`의 `skills/learn/behavior.md`·`onboarding.md`·`state-templates.md`·`hooks/session_start.py`를 한국어로 옮기고 이 킷에 맞게 고친 것이다. 원본 라이선스 고지:
+
+```
+MIT License
+
+Copyright (c) 2026 Noah Kim
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
