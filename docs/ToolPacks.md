@@ -142,7 +142,7 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | 3D 에셋 | getlayers, spline | 3D 요소가 필요할 때. spline은 런타임 스크립트를 싣는 방식이라 성능 영향을 확인한다(`.agents/skills/web-performance/SKILL.md`) |
 | 이미지·영상 | unsplash, pexels, lummi | 자리 표시용·배경용 사진과 영상이 필요할 때 |
 | 컬러 팔레트 | coolors, color hunt, realtime colors | 색 조합을 정할 때. 대비는 접근성 기준으로 따로 확인한다 |
-| 목업 | shots, mockuuups, previewed, app-mockup.com | README·소개 자료용 기기 목업 이미지를 만들 때. app-mockup.com은 앱스토어 스크린샷 디자인용 |
+| 목업 | shots, mockuuups, previewed, app-mockup.com, ogfolio.com | README·소개 자료용 기기 목업 이미지를 만들 때. app-mockup.com은 앱스토어 스크린샷 디자인용, ogfolio.com은 링크 공유 미리보기(Open Graph) 이미지 사례 모음이라 참고용 |
 | 웹사이트 레퍼런스 | inspo.page(접속 시 details.so/inspo로 이동), brandlogo.co, admiretheweb.com, umanmade.com | 화면 구성·UI 패턴·브랜드 로고·모션 사례를 둘러볼 때. 실제 서비스 화면·플로우 검색은 Lazyweb MCP(위 전역 코어)가 맡는다 |
 | 영상 프롬프트 모음 | awesome-opus5-5-videos (`yihui-dev/awesome-opus5-5-videos` — 목록의 "amazing opus 5.5 videos"와 같은 것인지는 이름이 가장 가깝다는 근거뿐이라 추정) | 영상 제작 프롬프트 사례를 찾을 때. 프롬프트를 복사해 쓰는 읽을거리다. 미리보기 링크가 제3자 사이트로 연결된다 |
 
