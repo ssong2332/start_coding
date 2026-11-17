@@ -5,6 +5,9 @@
 ## [Unreleased]
 
 ### Added
+- 2026-11-17 `docs/ToolPacks.md` 웹 프론트엔드 팩에 전역(user 스코프) 설치 4건 반영: emil-design-eng(emilkowalski/skills 20개 중 이것만, 나머지 3개는 미설치), shadcn 공식 스킬(`shadcn-ui/ui`의 `skills/shadcn`), GSAP 공식 스킬(`greensock/gsap-skills`, 8종 설치 후 같은 날 gsap-frameworks 1종 제거해 현재 7종), 21st.dev 플러그인 v0.4.1(스킬 7개 + 원격 MCP 1개, 상시 약 1,513토큰). 같은 저장소의 `apple-design`·`migrate-radix-to-base`는 설치하지 않음으로 기록
+- 2026-11-17 `docs/ToolPacks.md` MCP 표(context7·playwright·sequential-thinking 행): 2026-10-27 연결 실패·시간 초과의 원인 확인·해소 기록 — `npx`로 띄우는 서버 3개만 실패, 서버는 정상이나 시작에 40~49초가 걸려 30초 제한 초과, 세 패키지 전역 설치(`npm install -g`) 후 10~14초로 단축되고 `claude mcp list`에서 3개 연결. 빨라진 원인(전역 설치 대 내려받기 캐시)은 미확인으로 표기, 재발 시 `MCP_TIMEOUT` 검토(2026-11-17 사용자 결정)
+- 2026-11-17 `docs/ToolPacks.md` 웹 프론트엔드 팩 주의 사항: GSAP 스킬 설명문이 "다른 라이브러리가 지정되지 않으면 GSAP 추천"이라 라이브러리 선택은 Architecture 스택 표를 따름, 8개 전부 설치(이후 1종 제거)는 통합 하네스 통설치에 해당하지 않는다는 판정 근거, 21st.dev의 `API_KEY_21ST`는 사용자가 직접 설정하며 MCP 인증 방식(환경 변수 키 대 `/mcp` 승인)은 미확인
 - 2026-11-17 공용 스킬 `.agents/skills/root-cause-debugging/SKILL.md`(원인 진단 절차: 재현 → 위치 좁히기 → 최소화 → 근본 수정 → 재발 방지, 인과 사슬 확인, 재현 불가 분기표)와 Claude 연결 파일 `.claude/skills/root-cause-debugging/SKILL.md`. AGENTS.md 공용 스킬 표에 행 추가
 - 2026-11-17 `docs/Lessons.md` — 검증된 틀린 가정·안 통한 시도 기록(행 추가는 메인 세션만, 자격·형태는 문서 안). AGENTS.md 문서 소유권 표에 행, 문서 우선순위 밖 문서임을 명시. planner·architect·implementer·reviewer 역할 원본이 `유효` 행을 참고 자료로 읽고, implementer·QA·reviewer 보고 템플릿에 `교훈 후보:` 전달 칸 추가
 - 2026-11-17 `docs/KitFeedback.md`에 "어떤 형태로 고칠 것인가"(5단계 판정표)·"어디에 둘 것인가"·"성공 신호" 절과 행 7·8(Bash 가드 `git commit -n` 오탐 — 2026-11-17 사용자 결정으로 기각, 회피는 git 명령과 `-n` 옵션 명령을 별도 호출로 나눔)
@@ -28,6 +31,10 @@
 - {{DATE}} 프로젝트 초기화 (start_coding 템플릿)
 
 ### Changed
+- 2026-11-17 `.agents/roles/architect.role.md` 절차 7번: 시각적 완성도는 설계 대상이 아니지만 모션·UI 라이브러리를 쓸지와 무엇을 쓸지(GSAP·Framer Motion·shadcn 등 또는 CSS만)는 설계 대상으로 Architecture 스택 표에 적고, 표에 없는 라이브러리는 구현 단계 스킬이 추천해도 쓰지 않음을 명시(2026-11-17 사용자 결정: 모션 설계 분담은 역할 문서에 명시)
+- 2026-11-17 `.agents/roles/implementer.role.md` 사전 읽기 9번: `gsap-*`·`shadcn` 스킬은 Architecture 스택 표에 해당 라이브러리가 있을 때만 쓴다는 불릿과 "모션·UI의 분담" 불릿 추가 — 라이브러리 선택은 스택 표(architect), 스킬 설명문의 특정 라이브러리 추천(GSAP 추천, 21st 먼저 검색)은 스택 표에 없으면 따르지 않음, 모션 배치는 implementer가 스킬로 구현하고 판단은 사용자 화면 확인, 보고에 모션을 화면·요소별로 적음
+- 2026-11-17 `docs/ToolPacks.md` GSAP 스킬 행: "8종"을 "7종"으로 정정(gsap-frameworks를 같은 날 제거 — 사용자 결정, `npx skills remove -g -a claude-code -s gsap-frameworks`), 8종 설치 사실과 통설치 비해당 판정 근거(단일 목적 저장소) 유지, 분담은 architect·implementer 역할 원본 참조 안내 추가
+- 2026-11-17 `docs/ToolPacks.md` 전역 코어 "스킬 7종" 행에 "이 행이 전역 스킬의 전부는 아니다" 설명 추가: `~/.claude/skills`에는 코어 외에 agent-reach·graphify·emil-design-eng·shadcn·gsap-* 7종(8종 설치 후 gsap-frameworks 제거)과 개인 스킬 2개가 더 있고, 전역 설치 스킬의 설명문은 모든 세션에 상시 로드됨. 같은 행에 플러그인 example-skills·cicd-automation·payment-processing이 2026-11-17 기준 비활성(사용자 결정)임을 기록
 - 2026-11-17 `docs/ToolPacks.md`: LLM 게이트웨이 금지 문구에 "한도 우회 목적에 한한다 — 토큰 절약 목적의 로컬 도구·프록시는 해당하지 않는다(2026-11-17 사용자 결정)" 추가. ponytail 행을 실설치 기준(v5.3.3, 이전 "설치됨 (full 모드)" 표기는 설치 흔적이 없어 정정)으로 갱신, debugger 대체 행에 root-cause-debugging 편입 반영. 판정 규칙 "코드베이스 10k줄 이상" 행의 기본 도구를 Serena에서 graphify로 변경(Serena는 대안, 둘 중 하나만 사용 — 2026-11-17 사용자 결정)
 - 2026-11-17 implementer·QA·reviewer 역할 원본: 같은 실패 2회 후 원인 분석을 root-cause-debugging 스킬로 연결 (QA·reviewer는 1~3단계 진단까지만). 스킬의 추정 원인 처리에 "서브에이전트는 보고하고 종료하며 승인을 기다리며 멈춰 있지 않는다" 보완
 - 2026-11-17 `docs/KitFeedback.md`: 상태값에 부가 설명을 붙일 수 있게 하고 반영 절차에 형태 판정 단계 추가
