@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Added
+- 2026-11-17 `docs/ToolPacks.md` "디자인·콘텐츠 참고 사이트" 표 목업 행에 ogfolio.com(OG 이미지 큐레이션 라이브러리) 추가(사용자 제공 주소 https://www.ogfolio.com/ — 메인 세션이 curl로 HTTP 200과 제목 "OGFolio | Curated Library of Open Graph Images" 확인, 인용). 직전 행의 "ogfoli.com"은 사용자 목록의 오기였고 실제 주소는 ogfolio.com. 라이선스는 다른 참고 사이트와 같이 미확인
 - 2026-11-17 `.gitignore`에 `.artifacts/learn-mode/` 추가(사용자 지시: "제외해" — 학습 모드 개인 진도 상태 파일을 Git 추적에서 제외, `git check-ignore -v`로 .gitignore:38 확인). `docs/ToolPacks.md` "디자인·콘텐츠 참고 사이트" 표에 svgl.app·icon.museum(아이콘), kexsio.com(UI 컴포넌트), app-mockup.com(목업)과 "웹사이트 레퍼런스" 행(inspo.page→details.so/inspo, brandlogo.co, admiretheweb.com, umanmade.com) 추가. 사용자 목록의 ogfoli.com은 DNS가 풀리지 않아(메인 세션 실측 — 인용) 제외
 - 2026-11-17 AGENTS.md 상시 로드 분량 축소(사용자 지시: "1~4 진행", 20855자 → 18978자 — 메인 세션 보고값, 인용). ① "앱 서브 세션" 하위 절 본문을 Claude 전용 스킬 `.claude/skills/app-subsession/SKILL.md`로 이관(AGENTS.md엔 한 줄 참조) ② "강제 장치 (도구별)" 표를 요약 문단과 `.claude/hooks/README.md` 참조로 축소 ③ "진행 중 요구사항 변경" 분류 표를 `.agents/roles/planner.role.md`로 이관(AGENTS.md엔 원칙만, architect 역할 원본 9항 참조 경로도 갱신) ④ 날짜·근거 꼬리·이유 산문·문서 우선순위 괄호 정리
 - 2026-11-17 하네스 비교 조사의 부분 차용 후보 3건 반영(사용자 지시: "1·3·4 반영"). `.agents/skills/tdd-practitioner/SKILL.md`에 "유효하지 않은 Red" 표(테스트 0개·로드 오류·러너 비정상 종료·무관한 테스트만 실패·구현 전 통과는 Red로 인정하지 않음, Red 증거에 실패 이름·메시지가 "기대 동작 없음"을 가리키는지 한 줄 기록 — gsd-core `gate-tdd-red-evidence` 판정 기준의 개념 차용). `.agents/roles/implementer.role.md`에 7항 "리뷰·QA 지적을 받아 반영할 때" 추가(지적을 코드·테스트·요구사항과 대조해 맞으면 Red→수정→Green, 틀리면 반증 근거를 보고, 판단 불가면 확인할 것을 보고 — superpowers `receiving-code-review` 절차의 개념 차용)
