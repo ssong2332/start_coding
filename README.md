@@ -37,7 +37,7 @@ bash scripts/init.sh "프로젝트명"
 {{PROJECT_NAME}}/
 ├── AGENTS.md          # 마스터 규칙 (단일 원본)
 ├── CLAUDE.md          # Claude Code 어댑터
-├── docs/              # 프로젝트 문서 + ToolPacks.md(스킬·MCP 팩) + KitFeedback.md(템플릿 개선 대기열)
+├── docs/              # 프로젝트 문서 + ToolPacks.md(스킬·MCP 팩) + KitFeedback.md(템플릿 개선 대기열) + Lessons.md(검증된 틀린 가정·안 통한 시도 기록, 참고 자료)
 ├── scripts/           # 초기화 스크립트 init.ps1·init.sh(1회 실행) + agy-guard.js(안티그래비티 가드, 상주)
 ├── .agents/roles/     # 역할 단일 원본 (*.role.md — 3개 도구 공용)
 ├── .agents/skills/    # 공용 스킬 원본 (안티그래비티·Codex 직접 사용)
