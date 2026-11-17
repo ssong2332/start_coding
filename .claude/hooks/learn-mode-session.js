@@ -19,7 +19,8 @@ function decide(payload) {
       p = path.join(p, part);
       if (fs.lstatSync(p).isSymbolicLink()) return null;
     }
-    text = fs.readFileSync(p, "utf8").replace(/^﻿/, "");
+    text = fs.readFileSync(p, "utf8");
+    if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // UTF-8 BOM
   } catch {
     return null;
   }

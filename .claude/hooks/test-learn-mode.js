@@ -34,7 +34,7 @@ try {
   fs.writeFileSync(profile, "Learning mode: paused\nOnboarding: complete\n");
   t("paused → 아무것도 안 함", () => assert.strictEqual(decide(ev(root)), null));
 
-  fs.writeFileSync(profile, "﻿Learning mode: active\r\nOnboarding: complete\r\n");
+  fs.writeFileSync(profile, String.fromCharCode(0xfeff) + "Learning mode: active\r\nOnboarding: complete\r\n");
   t("BOM·CRLF가 붙은 active → 안내 주입", () => assert.notStrictEqual(decide(ev(root)), null));
 
   fs.writeFileSync(profile, "Learning mode: paused\n\n## 메모\nLearning mode: active\n");
