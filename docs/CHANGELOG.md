@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 ### Added
+- 2026-11-17 파괴적 git 가드 우회 보완(6b960fb, 리뷰 치명 3건·권고 반영): 치명 — git 전역 옵션(-C 등)을 낀 명령, restore 옵션 순서 변형, branch 짧은 플래그 묶음(-df류)이 가드를 우회하던 것을 차단. 권고 — restore -S 오탐 제거, `./`·`*`·`:/` 경로 변형 차단, 반복 구간 처리, agy 경로 테스트 4건 추가. `test-guards.js` 88/88 → 108/108(메인 세션 실측, 재리뷰 reviewer 108/108 재현 — 인용; 바로 아래 행의 88/88은 당시 기록으로 그대로 둠). 원격 브랜치 삭제 push 등은 `.claude/hooks/README.md`에 "범위 밖"으로 명시
 - 2026-11-17 되돌릴 수 없는 git 명령 차단 가드(사용자 지시: "둘 다 반영" — mattpocock/skills의 git-guardrails 개념 차용): 새 `.claude/hooks/lib/destructive-git.js`를 `block-main-writes.js`와 `scripts/agy-guard.js`가 공유. 차단 대상은 reset --hard, clean -f, branch -D·-d -f, 강제 push(--force-with-lease는 허용), checkout ., restore .(--staged만이면 허용). 원본의 push 전체 차단은 병합 후 push 흐름과 충돌해 제외. `test-guards.js`에 케이스 21개 추가(67/67 → 88/88, 메인 세션 실측 — 인용; Red 15건 증거 `.artifacts/verification/ADHOC-guard-destructive/`). `.claude/hooks/README.md` 훅 표, AGENTS.md 강제 장치 절 차단 대상, README.md 훅 승인 안내 갱신
 - 2026-11-17 `docs/HarnessAudit.md`에 H8(상시 로드 문서는 모든 경우에 필요한 것만 두고 일부 경우용은 참조로 이관)·H9(각 단계를 판별 가능한 완료 조건으로 끝내기) 추가 — mattpocock/skills writing-for-agents 개념 차용. H2의 "강제 장치 표"를 "강제 장치 절(`.claude/hooks/README.md` 훅 표 포함)"로 정정
 - 2026-11-17 `docs/ToolPacks.md` "디자인·콘텐츠 참고 사이트" 표 목업 행에 ogfolio.com(OG 이미지 큐레이션 라이브러리) 추가(사용자 제공 주소 https://www.ogfolio.com/ — 메인 세션이 curl로 HTTP 200과 제목 "OGFolio | Curated Library of Open Graph Images" 확인, 인용). 직전 행의 "ogfoli.com"은 사용자 목록의 오기였고 실제 주소는 ogfolio.com. 라이선스는 다른 참고 사이트와 같이 미확인
