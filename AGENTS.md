@@ -268,6 +268,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | docs/UpdateRequests.md | docs (행 추가만, append-only) | 담당으로 지목된 planner/architect가 상태 열만 `open`→`resolved`로 변경 가능. 그 외 읽기 전용 |
 | .artifacts/verification/ | implementer·quality-assurance (자기 실행의 로그·메타데이터 생성) | 그 외 읽기 전용, 기존 증거 덮어쓰기·삭제 금지 |
 | .codex/EXECUTION.md, .codex/DEVELOPMENT.md, .codex/FRONTEND.md, .codex/tests/ | 사용자 | Codex 실행 결과 수집·개발 보조·UI 지침과 그 연결 검사, 읽기 전용 |
+| .artifacts/learn-mode/ | 메인 세션 (학습 모드 상태 파일 profile.md·progress.md·project-map.md 생성·갱신) | 그 외 읽기 전용. Git 추적 제외 여부는 사용자가 정한다 |
 | .artifacts/handoff/ | 메인 세션(prompt.md 작성)·작업을 받은 세션(같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
 | 소스 코드 | implementer (메인 세션이 "메인 세션과 서브에이전트 구분" 표에 따라 직접 구현할 때는 implementer 역할로 수정한다 — 역할 원본의 금지·절차·증거 보존·보고 의무 포함) | 읽기 전용 |
 
@@ -284,6 +285,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | security-audit | 시크릿·주입·인증/인가(IDOR)·입력 검증 체크리스트 | reviewer, implementer, 보안 요구 시 architect |
 | web-performance | Core Web Vitals, 렌더링 최적화, 접근성(a11y) | 웹 프로젝트의 implementer, quality-assurance, reviewer |
 | vibe-mode | 6-에이전트 파이프라인·승인 게이트를 우회하는 대안 경로(짧은 인터뷰 5항목·서브에이전트 미호출·main 직접 커밋 금지). **사용자가 명시적으로 요청했을 때만** 시작 — 이 표의 다른 스킬·정식 파이프라인을 대체하지 않는다 | 메인 세션 (사용자가 vibe 진행을 요청했을 때만) |
+| learn-mode | 학습 모드 — 사용자가 설계를 먼저 말하고 AI가 피드백·개념 설명·합의된 구현을 맡는다(`nykooi1/vibe-wise` 행동 규칙 차용). 승인 게이트·금지 규칙은 그대로이고, 메인 세션이 사용자에게 결정을 넘기는 방식만 바꾼다. **사용자가 명시적으로 켰을 때만** 시작하며, Claude Code에서는 SessionStart 훅이 켜진 상태를 세션마다 이어 준다 | 메인 세션 (사용자가 학습 모드를 켰을 때만) |
 
 설치·선택 팩은 docs/ToolPacks.md 참조.
 
