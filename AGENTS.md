@@ -239,7 +239,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | .codex/hooks.json | 사용자 | 읽기 전용 (Codex 강제 계층) — 우회 목적 편집 금지 |
 | .codex/agents/ | 사용자 | 읽기 전용 (Codex 6-에이전트 정의 — 실행 중 자기 정의 수정 금지) |
 | .agents/roles/ | 사용자 | 읽기 전용 (역할 단일 원본 — 실행 중 자기 정의 수정 금지) |
-| .claude/skills/ | 사용자 | 읽기 전용 (공용 스킬 연결 파일과 Claude 전용 스킬 cli-delegate) |
+| .claude/skills/ | 사용자 | 읽기 전용 (공용 스킬 연결 파일과 Claude 전용 스킬 cli-delegate·app-subsession) |
 | .agents/skills/ | 사용자 | 읽기 전용 (3-도구 공용 상세 가이드) |
 | .claude/agents/ | 사용자 | 읽기 전용 (6-에이전트 연결 파일 — 도구 권한·모델만 정의. 에이전트가 실행 중 자기 정의를 고치는 대상이 아니다) |
 | scripts/init.ps1, scripts/init.sh | 사용자 | 읽기 전용 (초기화 스크립트, 1회성) |
