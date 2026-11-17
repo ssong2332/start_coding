@@ -34,3 +34,5 @@ venv/
 .artifacts/verification/
 # 다른 도구 세션과의 핸드오프 파일 (AGENTS.md "다른 도구 세션과의 핸드오프")
 .artifacts/handoff/
+# 학습 모드 개인 진도 상태 (.agents/skills/learn-mode/SKILL.md)
+.artifacts/learn-mode/
