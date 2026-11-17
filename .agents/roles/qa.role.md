@@ -21,7 +21,7 @@
 8. `.agents/skills/tdd-practitioner/SKILL.md` (테스트 유효성 판정 기준), 웹 프로젝트면 `.agents/skills/web-performance/SKILL.md`
 
 ## 공통 증거·도구 처리
-AGENTS.md의 검증 증거 보존과 화면 검증 도구 실패 처리 규칙을 따른다. implementer는 Red를 수정 전에 보존하고 QA는 원본과 재실행 결과를 대조한다. Green·회귀 증거 경로를 보고에 첨부한다. 아래 화면 확인 도구는 현재 세션에 있는 브라우저 도구를 뜻한다(Claude Code는 Browser pane — 도구 이름은 `.claude/agents/` 연결 파일 참조). 사용 가능한 경우에 적용하며, 도구 부재·실패 시 공통 표에 따라 담당과 미검증 범위를 보고한다.
+AGENTS.md의 검증 증거 보존과 화면 검증 도구 실패 처리 규칙을 따른다. implementer는 Red를 수정 전에 보존하고 QA는 원본과 재실행 결과를 대조한다. 보존된 Red가 `.agents/skills/tdd-practitioner/SKILL.md`의 "유효하지 않은 Red" 표에 해당하면(테스트 0개·로드 오류·무관한 실패 등) DoD Red-First 항목을 미통과로 판정한다. Green·회귀 증거 경로를 보고에 첨부한다. 아래 화면 확인 도구는 현재 세션에 있는 브라우저 도구를 뜻한다(Claude Code는 Browser pane — 도구 이름은 `.claude/agents/` 연결 파일 참조). 사용 가능한 경우에 적용하며, 도구 부재·실패 시 공통 표에 따라 담당과 미검증 범위를 보고한다.
 
 ## 절차
 1. 대상 확정: 호출자가 지정한 작업(T-xx), 없으면 `git diff`로 변경분 파악
