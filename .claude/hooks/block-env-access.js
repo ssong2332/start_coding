@@ -11,8 +11,15 @@
 // 셸(Bash·PowerShell) 문자열 매칭은 최선 노력 계층이지 보안 경계가 아니다 — 우발적·습관적
 // 위반을 잡는 용도이며, 의도적 우회는 막지 못한다(.claude/hooks/README.md).
 const { readHookInput } = require("./lib/read-hook-input");
-// 판정 규칙은 안티그래비티 가드와 공유한다 (lib/env-rules.js)
-const { isEnvPath, commandTouchesEnv } = require("./lib/env-rules");
+// 판정 규칙은 안티그래비티 가드와 공유한다 (lib/env-rules.js). 모듈이 없으면 예외로 죽어 exit 1(=허용)이 되므로
+// .env 보호가 조용히 사라지지 않게 안전 쪽으로 대체한다 — .env 이름이 들어간 경로·명령은 모두 막는다(오탐 허용).
+let isEnvPath, commandTouchesEnv;
+try {
+  ({ isEnvPath, commandTouchesEnv } = require("./lib/env-rules"));
+} catch {
+  isEnvPath = (p) => typeof p === "string" && /(^|[\\/])\.env(?!\.example$)/i.test(p);
+  commandTouchesEnv = (c) => typeof c === "string" && /\.env(?!\.example\b)/i.test(c);
+}
 
 readHookInput((payload) => {
   const toolName = payload?.tool_name;

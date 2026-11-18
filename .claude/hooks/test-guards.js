@@ -222,6 +222,14 @@ CASES.push(
   [noLib, bash(`${GC} -` + `nm "x"`), "BLOCK", "[모듈 없음] 짧은 플래그는 대체 정규식으로 차단"],
   [noLib, bash("git status"), "ALLOW", "[모듈 없음] 대체 경로가 정상 명령을 막지 않음"]
 );
+// env-rules 모듈이 없을 때도 block-env-access가 .env를 막아야 한다 (f336bf2 리뷰 권고 3)
+fs.copyFileSync(path.join(__dirname, "block-env-access.js"), path.join(noLibDir, "block-env-access.js"));
+const noLibEnv = path.join(noLibDir, "block-env-access.js");
+CASES.push(
+  [noLibEnv, bash(`cat ${E}`), "BLOCK", "[모듈 없음] env 가드가 .env 읽기를 막음"],
+  [noLibEnv, { tool_name: "Read", tool_input: { file_path: E } }, "BLOCK", "[모듈 없음] Read .env 차단"],
+  [noLibEnv, { tool_name: "Read", tool_input: { file_path: `${E}.example` } }, "ALLOW", "[모듈 없음] 플레이스홀더 허용"]
+);
 
 // PowerShell 도구 경로 — Claude Code는 Bash 말고 PowerShell 도구로도 셸 명령을 실행한다(2026-11-18 사용자 지시 "연결해").
 // 같은 payload 스키마(tool_name/tool_input.command)로 가드가 똑같이 판정해야 한다.
@@ -365,10 +373,7 @@ const ENV_PARITY = [
   `echo x > .\\${E}`, `Get-Content ${E}.example`, `Test-Path ${E}`, `node -e "process${E}.X"`, `npm test`,
 ];
 for (const cmd of ENV_PARITY) {
-  const claude = verdict("block-env-access.js", ps(cmd));
-  const agyV = agyVerdict(agy(cmd));
-  AGY_CASES.push([agy(cmd), claude, `[agy=claude] ${cmd}`]);
-  void agyV;
+  AGY_CASES.push([agy(cmd), verdict("block-env-access.js", ps(cmd)), `[agy=claude] ${cmd}`]);
 }
 
 let failed = 0;
