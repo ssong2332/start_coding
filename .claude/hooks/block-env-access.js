@@ -11,17 +11,12 @@
 // 셸(Bash·PowerShell) 문자열 매칭은 최선 노력 계층이지 보안 경계가 아니다 — 우발적·습관적
 // 위반을 잡는 용도이며, 의도적 우회는 막지 못한다(.claude/hooks/README.md).
 const { readHookInput } = require("./lib/read-hook-input");
+// 판정 규칙은 안티그래비티 가드와 공유한다 (lib/env-rules.js)
+const { isEnvPath, commandTouchesEnv } = require("./lib/env-rules");
 
 readHookInput((payload) => {
   const toolName = payload?.tool_name;
   const ti = payload?.tool_input || {};
-
-  const isEnvPath = (p) => {
-    if (typeof p !== "string") return false;
-    const base = p.replace(/\\/g, "/").split("/").pop() || "";
-    // Windows 파일 시스템은 대소문자를 가리지 않는다(.ENV도 같은 파일) — 203ce33 리뷰 치명 1
-    return /^\.env(\..+)?$/i.test(base) && base.toLowerCase() !== ".env.example";
-  };
 
   const block = (what) => {
     console.error(
@@ -31,7 +26,8 @@ readHookInput((payload) => {
   };
 
   if (["Read", "Edit", "Write", "NotebookEdit"].includes(toolName)) {
-    if (isEnvPath(ti.file_path)) block(`${toolName} "${ti.file_path}"`);
+    // NotebookEdit는 notebook_path를 쓴다
+    for (const p of [ti.file_path, ti.notebook_path]) if (isEnvPath(p)) block(`${toolName} "${p}"`);
     process.exit(0);
   }
 
@@ -56,20 +52,7 @@ readHookInput((payload) => {
   // PowerShell 도구도 같은 셸 명령 문자열을 받는다 (2026-11-18 PowerShell 배선)
   if (toolName === "Bash" || toolName === "PowerShell") {
     const command = ti.command;
-    if (typeof command !== "string") process.exit(0);
-
-    // ".env" 또는 ".env.변형"이 독립 경로 세그먼트로 등장 (.env.example 제외).
-    // "process.env" 처럼 식별자 일부인 경우는 앞 문자 조건으로 걸러진다.
-    // 뒤따르는 문자에 PowerShell에서 흔히 붙여 쓰는 ; | , * ? } ] 포함, 대소문자 무시 — 203ce33 리뷰 치명 1
-    const envRefPattern = /(^|[\s"'`/\\:(])\.env(?!\.example\b)(\.\w+)?(?=[\s"'`/\\:);|,*?}\]]|$)/i;
-    if (!envRefPattern.test(command)) process.exit(0);
-
-    const revealsOrOverwrites =
-      /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk|Copy-Item|cpi|Import-Csv|ipcsv|sls|ii|Invoke-Item|ReadAll\w*|ReadLines|OpenText|StreamReader|Set-Content|sc|Add-Content|ac|Out-File|WriteAll\w*|AppendAll\w*|Move-Item|mi|move|Rename-Item|rni|ren|Remove-Item|ri|rm|del|erase)\b/i.test(
-        command
-      ) || />>?\s*['"]?(?:\.[\\/])?\.env(?!\.example\b)/i.test(command);
-
-    if (revealsOrOverwrites) block(`.env를 읽거나 덮어쓰는 명령: ${command}`);
+    if (commandTouchesEnv(command)) block(`.env를 읽거나 덮어쓰는 명령: ${command}`);
   }
 
   process.exit(0);
