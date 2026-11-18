@@ -222,6 +222,14 @@ CASES.push(
   [noLib, bash(`${GC} -` + `nm "x"`), "BLOCK", "[모듈 없음] 짧은 플래그는 대체 정규식으로 차단"],
   [noLib, bash("git status"), "ALLOW", "[모듈 없음] 대체 경로가 정상 명령을 막지 않음"]
 );
+// env-rules 모듈이 없을 때도 block-env-access가 .env를 막아야 한다 (f336bf2 리뷰 권고 3)
+fs.copyFileSync(path.join(__dirname, "block-env-access.js"), path.join(noLibDir, "block-env-access.js"));
+const noLibEnv = path.join(noLibDir, "block-env-access.js");
+CASES.push(
+  [noLibEnv, bash(`cat ${E}`), "BLOCK", "[모듈 없음] env 가드가 .env 읽기를 막음"],
+  [noLibEnv, { tool_name: "Read", tool_input: { file_path: E } }, "BLOCK", "[모듈 없음] Read .env 차단"],
+  [noLibEnv, { tool_name: "Read", tool_input: { file_path: `${E}.example` } }, "ALLOW", "[모듈 없음] 플레이스홀더 허용"]
+);
 
 // PowerShell 도구 경로 — Claude Code는 Bash 말고 PowerShell 도구로도 셸 명령을 실행한다(2026-11-18 사용자 지시 "연결해").
 // 같은 payload 스키마(tool_name/tool_input.command)로 가드가 똑같이 판정해야 한다.
@@ -271,8 +279,16 @@ CASES.push(
 // (affaan-m/ECC scripts/hooks/config-protection.js 개념 차용, 2026-11-18). 파일 존재 여부로 판정하므로
 // OS 임시 폴더에 fixture를 만들고 이 실행이 끝날 때 지운다.
 const cfgDir = fs.mkdtempSync(path.join(os.tmpdir(), "guard-lintcfg-"));
-for (const f of [".eslintrc.json", "eslint.config.base.mjs", ".prettierignore", "vite.config.ts"]) {
+for (const f of [".eslintrc.json", "eslint.config.base.mjs", ".prettierignore", "vite.config.ts", ".flake8", ".golangci.yml", ".rubocop.yml"]) {
   fs.writeFileSync(path.join(cfgDir, f), "{}");
+}
+// 다른 이름의 심볼릭 링크로 보호 파일을 고치는 우회 — 링크를 만들 권한이 없는 Windows에서는 이 케이스를 건너뛴다
+let linkOk = false;
+try {
+  fs.symlinkSync(path.join(cfgDir, ".eslintrc.json"), path.join(cfgDir, "innocent.json"), "file");
+  linkOk = true;
+} catch {
+  console.log("  skip  protect-lint-config.js 심볼릭 링크 케이스 — 이 환경에서 링크를 만들 권한 없음 (미검증)");
 }
 const cfg = (name) => path.join(cfgDir, name);
 const PLC = "protect-lint-config.js";
@@ -290,7 +306,20 @@ CASES.push(
   // 2b50c7a 리뷰 권고 3 — 코드가 처리하는 나머지 경로
   [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Delete File: ${cfg(".prettierignore")}\n` } }, "BLOCK", "[Codex] apply_patch로 기존 ignore 삭제"],
   [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg("a.js")}\n*** Move to: ${cfg(".eslintrc.json")}\n` } }, "BLOCK", "[Codex] 다른 파일을 기존 설정 위치로 이동"],
-  [PLC, { tool_name: "NotebookEdit", tool_input: { notebook_path: cfg(".eslintrc.json") } }, "BLOCK", "NotebookEdit notebook_path 인자"]
+  [PLC, { tool_name: "NotebookEdit", tool_input: { notebook_path: cfg(".eslintrc.json") } }, "BLOCK", "NotebookEdit notebook_path 인자"],
+  // 2b50c7a 리뷰 남은 권고 (2026-11-18) — Codex 상대 경로는 payload.cwd 기준, 보호 목록 확장
+  [PLC, { tool_name: "apply_patch", cwd: cfgDir, tool_input: { command: `*** Update File: .eslintrc.json\n@@\n-a\n+b\n` } }, "BLOCK", "[Codex] 상대 경로를 payload.cwd 기준으로 판정"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".flake8") } }, "BLOCK", "Python flake8 설정"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".golangci.yml") } }, "BLOCK", "Go golangci-lint 설정"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".rubocop.yml") } }, "BLOCK", "Ruby rubocop 설정"]
+);
+
+if (linkOk) {
+  CASES.push([PLC, { tool_name: "Write", tool_input: { file_path: cfg("innocent.json") } }, "BLOCK", "다른 이름의 심볼릭 링크로 보호 설정 덮어쓰기"]);
+}
+// block-env-access — NotebookEdit는 file_path가 아니라 notebook_path를 쓴다 (2b50c7a 리뷰 범위 밖 관찰)
+CASES.push(
+  ["block-env-access.js", { tool_name: "NotebookEdit", tool_input: { notebook_path: `C:\\p\\${E}` } }, "BLOCK", "NotebookEdit notebook_path가 .env"]
 );
 
 // 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
@@ -337,6 +366,15 @@ const AGY_CASES = [
   [agy(`Set-Content ${E} x`), "BLOCK", "[agy] PowerShell 덮어쓰기"],
   [agy(`Get-Content ${E}.example`), "ALLOW", "[agy] 플레이스홀더 읽기"],
 ];
+
+// 드리프트 방지 (2b50c7a 리뷰 권고 7): 같은 셸 명령에 대해 Claude env 가드와 agy env 판정이 같아야 한다.
+const ENV_PARITY = [
+  `gc ${E}`, `gc ${E}|sls K`, `gc ${E.toUpperCase()}`, `Set-Content ${E} x`, `Remove-Item ${E}`, `cat ${E}`,
+  `echo x > .\\${E}`, `Get-Content ${E}.example`, `Test-Path ${E}`, `node -e "process${E}.X"`, `npm test`,
+];
+for (const cmd of ENV_PARITY) {
+  AGY_CASES.push([agy(cmd), verdict("block-env-access.js", ps(cmd)), `[agy=claude] ${cmd}`]);
+}
 
 let failed = 0;
 for (const [payload, expected, why] of AGY_CASES) {
