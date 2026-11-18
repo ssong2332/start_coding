@@ -264,6 +264,28 @@ CASES.push(
   ["confirm-agy-delegate.js", ps(`agy --dangerously-skip-permissions -p x`), "ASK", "[PowerShell] 권한 우회 위임"]
 );
 
+// protect-lint-config — 이미 있는 린터·포매터 설정·ignore 파일 수정 차단, 새로 만들기는 허용
+// (affaan-m/ECC scripts/hooks/config-protection.js 개념 차용, 2026-11-18). 파일 존재 여부로 판정하므로
+// OS 임시 폴더에 fixture를 만들고 이 실행이 끝날 때 지운다.
+const cfgDir = fs.mkdtempSync(path.join(os.tmpdir(), "guard-lintcfg-"));
+for (const f of [".eslintrc.json", "eslint.config.base.mjs", ".prettierignore", "vite.config.ts"]) {
+  fs.writeFileSync(path.join(cfgDir, f), "{}");
+}
+const cfg = (name) => path.join(cfgDir, name);
+const PLC = "protect-lint-config.js";
+CASES.push(
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".eslintrc.json") } }, "BLOCK", "기존 ESLint 설정 수정"],
+  [PLC, { tool_name: "Write", tool_input: { file_path: cfg(".ESLINTRC.JSON") } }, "BLOCK", "대소문자만 다른 같은 파일 (NTFS)"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg("eslint.config.base.mjs") } }, "BLOCK", "분할된 공용 설정 파일"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".prettierignore") } }, "BLOCK", "ignore 목록에 경로 추가로 검사 회피"],
+  [PLC, { tool_name: "Write", tool_input: { file_path: cfg(".prettierrc.json") } }, "ALLOW", "설정이 없을 때 새로 만들기 (T-01 하네스 구축)"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg("vite.config.ts") } }, "ALLOW", "빌드 설정은 대상 아님"],
+  [PLC, { tool_name: "Read", tool_input: { file_path: cfg(".eslintrc.json") } }, "ALLOW", "읽기는 허용"],
+  [PLC, { tool_name: "MultiEdit", tool_input: { file_path: cfg("a.js"), edits: [{ file_path: cfg(".eslintrc.json") }] } }, "BLOCK", "MultiEdit 항목별 경로"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg(".eslintrc.json")}\n@@\n-a\n+b\n` } }, "BLOCK", "[Codex] apply_patch로 기존 설정 수정"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Add File: ${cfg("biome.json")}\n+{}\n` } }, "ALLOW", "[Codex] apply_patch로 새 설정 만들기"]
+);
+
 // 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
 // 스크립트가 PowerShell 입력을 판정할 수 있어도 배선이 없으면 실행되지 않는다(2026-11-18 이 세션에서 실제로 열려 있던 공백).
 const settings = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "settings.json"), "utf8"));
@@ -278,6 +300,14 @@ for (const tool of ["Bash", "PowerShell"]) {
     if (!ok) wiringFailures.push(`${tool} → ${g}`);
   }
 }
+for (const tool of ["Edit", "Write", "MultiEdit"]) {
+  const wired = (settings.hooks?.PreToolUse || [])
+    .filter((e) => new RegExp(`^(?:${e.matcher})$`).test(tool))
+    .flatMap((e) => e.hooks.map((h) => h.command));
+  if (!wired.some((c) => c.includes(PLC))) wiringFailures.push(`${tool} → ${PLC}`);
+}
+const codexHooks = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "..", ".codex", "hooks.json"), "utf8"));
+if (!JSON.stringify(codexHooks).includes(PLC)) wiringFailures.push(`.codex/hooks.json → ${PLC}`);
 
 // 안티그래비티 경로(scripts/agy-guard.js 2-2b)도 같은 판정 모듈로 막는지 — a59c376 리뷰 권고 7.
 // agy는 종료 코드가 아니라 stdout의 decision으로 답하므로 BLOCK/ALLOW로 옮겨 같은 표에 넣는다.
@@ -316,6 +346,7 @@ for (const [script, payload, expected, why] of CASES) {
 }
 } finally {
   fs.rmSync(noLibDir, { recursive: true, force: true });
+  fs.rmSync(cfgDir, { recursive: true, force: true });
 }
 
 console.log(`${wiringFailures.length ? " FAIL " : "  ok  "} ${"settings.json".padEnd(22)} 셸 가드 4종이 Bash·PowerShell 둘 다에 배선됨${wiringFailures.length ? " — 누락: " + wiringFailures.join(", ") : ""}`);
