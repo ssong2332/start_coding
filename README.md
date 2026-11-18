@@ -44,7 +44,7 @@ bash scripts/init.sh "프로젝트명"
 ├── .agents/scripts/   # .agents cwd에서 기존 안티그래비티 가드를 호출하는 진입점
 ├── .claude/agents/    # 6-에이전트 연결 파일 (도구 권한·모델만 정의, 본문은 .agents/roles/)
 ├── .claude/skills/    # Claude Code의 공용 스킬 연결 파일 + 전용 스킬 cli-delegate(Codex·안티그래비티 위임)·app-subsession(앱 서브 세션)
-├── .claude/hooks/     # 강제 가드 4종(+ protect-lint-config: 기존 린터·포매터 설정 수정 차단) + 안티그래비티 위임 확인 훅(confirm-agy-delegate.js, Claude Code 전용) + 정합성 검사 (가드는 Claude Code·Codex 공유)
+├── .claude/hooks/     # 강제 가드 4종(+ protect-lint-config: 기존 린터·포매터 설정 수정 차단) + 안티그래비티 위임 확인 훅(confirm-agy-delegate.js, Claude Code 전용) + 정합성 검사 + 공유 판정 모듈 lib/ (.env 판정은 lib/env-rules.js를 Claude 가드와 안티그래비티 가드가 함께 사용) (가드는 Claude Code·Codex 공유)
 ├── .codex/agents/     # 6-에이전트 연결 파일 (Codex 전용, 본문은 .agents/roles/)
 ├── .codex/EXECUTION.md # Codex 실행 출력·세션 수집 안내
 ├── .codex/DEVELOPMENT.md·FRONTEND.md # Codex 개발 보조·UI 구현 지침
