@@ -209,6 +209,65 @@ CASES.push(
   [noLib, bash("git status"), "ALLOW", "[모듈 없음] 대체 경로가 정상 명령을 막지 않음"]
 );
 
+// PowerShell 도구 경로 — Claude Code는 Bash 말고 PowerShell 도구로도 셸 명령을 실행한다(2026-11-18 사용자 지시 "연결해").
+// 같은 payload 스키마(tool_name/tool_input.command)로 가드가 똑같이 판정해야 한다.
+const ps = (command) => ({ tool_name: "PowerShell", tool_input: { command } });
+CASES.push(
+  ["block-env-access.js", ps(`Get-Content ${E}`), "BLOCK", "[PowerShell] 시크릿 파일 읽기"],
+  ["block-env-access.js", ps(`Copy-Item ${E} x.txt`), "BLOCK", "[PowerShell] Copy-Item으로 복사"],
+  ["block-env-access.js", ps(`[IO.File]::ReadAllText('${E}')`), "BLOCK", "[PowerShell] .NET 직접 읽기"],
+  ["block-env-access.js", ps(`Get-Content ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더는 허용"],
+  // 203ce33 리뷰 치명 1·2, 권고 4 — 붙여 쓴 파이프·세미콜론, 대소문자, 별칭, .NET 읽기, 덮어쓰기 동사
+  ["block-env-access.js", ps(`gc ${E}|sls KEY`), "BLOCK", "[PowerShell] 파이프를 붙여 쓴 읽기"],
+  ["block-env-access.js", ps(`gc ${E};`), "BLOCK", "[PowerShell] 세미콜론을 붙여 쓴 읽기"],
+  ["block-env-access.js", ps(`gc ${E.toUpperCase()}`), "BLOCK", "[PowerShell] 대문자 파일 이름 (NTFS는 대소문자 무시)"],
+  ["block-env-access.js", ps(`sls KEY ${E}`), "BLOCK", "[PowerShell] Select-String 별칭 sls"],
+  ["block-env-access.js", ps(`ipcsv ${E}`), "BLOCK", "[PowerShell] Import-Csv 별칭 ipcsv"],
+  ["block-env-access.js", ps(`cpi ${E} x`), "BLOCK", "[PowerShell] Copy-Item 별칭 cpi"],
+  ["block-env-access.js", ps(`Import-Csv ${E}`), "BLOCK", "[PowerShell] Import-Csv"],
+  ["block-env-access.js", ps(`ii ${E}`), "BLOCK", "[PowerShell] Invoke-Item 별칭 ii (기본 앱으로 열기)"],
+  ["block-env-access.js", ps(`[IO.File]::ReadLines('${E}')`), "BLOCK", "[PowerShell] .NET ReadLines"],
+  ["block-env-access.js", ps(`New-Object IO.StreamReader('${E}')`), "BLOCK", "[PowerShell] .NET StreamReader"],
+  ["block-env-access.js", ps(`Set-Content ${E} x`), "BLOCK", "[PowerShell] Set-Content 덮어쓰기"],
+  ["block-env-access.js", ps(`sc ${E} x`), "BLOCK", "[PowerShell] Set-Content 별칭 sc"],
+  ["block-env-access.js", ps(`Add-Content ${E} x`), "BLOCK", "[PowerShell] Add-Content 덧붙이기"],
+  ["block-env-access.js", ps(`'x' | Out-File ${E}`), "BLOCK", "[PowerShell] Out-File 덮어쓰기"],
+  ["block-env-access.js", ps(`echo x > .\\${E}`), "BLOCK", "[PowerShell] .\\ 경로 리다이렉션"],
+  // 05d48f5 재리뷰 권고 N1 — .NET·cmdlet 쓰기·이동·삭제
+  ["block-env-access.js", ps(`[IO.File]::WriteAllText('${E}','x')`), "BLOCK", "[PowerShell] .NET WriteAllText"],
+  ["block-env-access.js", ps(`[IO.File]::AppendAllText('${E}','x')`), "BLOCK", "[PowerShell] .NET AppendAllText"],
+  ["block-env-access.js", ps(`Move-Item x ${E}`), "BLOCK", "[PowerShell] Move-Item으로 덮어쓰기"],
+  ["block-env-access.js", ps(`Rename-Item ${E} y`), "BLOCK", "[PowerShell] Rename-Item"],
+  ["block-env-access.js", ps(`Remove-Item ${E}`), "BLOCK", "[PowerShell] Remove-Item 삭제"],
+  // 재리뷰 권고 N3 — 오탐 방지 회귀
+  ["block-env-access.js", ps(`New-Item -ItemType File ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더 생성"],
+  ["block-env-access.js", ps(`git add ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더 스테이징"],
+  ["block-env-access.js", ps(`Get-Content ${E}ironment.txt`), "ALLOW", "[PowerShell] .env로 시작하는 다른 파일 이름"],
+  ["block-env-access.js", ps(`node -e "console.log(process${E}.HOME)"`), "ALLOW", "[PowerShell] process.env 식별자"],
+  ["block-env-access.js", ps(`Test-Path ${E}`), "ALLOW", "[PowerShell] 존재 확인은 내용을 드러내지 않는다"],
+  ["block-env-access.js", ps(`$env:PATH`), "ALLOW", "[PowerShell] 환경 변수 드라이브는 파일이 아니다"],
+  ["block-main-writes.js", ps("git reset `\n--hard"), "BLOCK", "[PowerShell] 백틱 줄 이어쓰기 (권고 3)"],
+  ["block-no-verify.js", ps(`${GC} --no-` + "verify -m x"), "BLOCK", "[PowerShell] 훅 우회 플래그"],
+  ["block-main-writes.js", ps("git reset --hard"), "BLOCK", "[PowerShell] 되돌릴 수 없는 git 명령"],
+  ["block-main-writes.js", ps("git status"), "ALLOW", "[PowerShell] 평범한 git 명령"],
+  ["confirm-agy-delegate.js", ps(`agy --dangerously-skip-permissions -p x`), "ASK", "[PowerShell] 권한 우회 위임"]
+);
+
+// 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
+// 스크립트가 PowerShell 입력을 판정할 수 있어도 배선이 없으면 실행되지 않는다(2026-11-18 이 세션에서 실제로 열려 있던 공백).
+const settings = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "settings.json"), "utf8"));
+const shellGuards = ["block-main-writes.js", "block-no-verify.js", "block-env-access.js", "confirm-agy-delegate.js"];
+const wiringFailures = [];
+for (const tool of ["Bash", "PowerShell"]) {
+  const wired = (settings.hooks?.PreToolUse || [])
+    .filter((e) => new RegExp(`^(?:${e.matcher})$`).test(tool))
+    .flatMap((e) => e.hooks.map((h) => h.command));
+  for (const g of shellGuards) {
+    const ok = wired.some((c) => c.includes(g));
+    if (!ok) wiringFailures.push(`${tool} → ${g}`);
+  }
+}
+
 // 안티그래비티 경로(scripts/agy-guard.js 2-2b)도 같은 판정 모듈로 막는지 — a59c376 리뷰 권고 7.
 // agy는 종료 코드가 아니라 stdout의 decision으로 답하므로 BLOCK/ALLOW로 옮겨 같은 표에 넣는다.
 const agyGuard = path.resolve(__dirname, "..", "..", "scripts", "agy-guard.js");
@@ -242,6 +301,8 @@ for (const [script, payload, expected, why] of CASES) {
   fs.rmSync(noLibDir, { recursive: true, force: true });
 }
 
-const total = CASES.length + AGY_CASES.length;
+console.log(`${wiringFailures.length ? " FAIL " : "  ok  "} ${"settings.json".padEnd(22)} 셸 가드 4종이 Bash·PowerShell 둘 다에 배선됨${wiringFailures.length ? " — 누락: " + wiringFailures.join(", ") : ""}`);
+if (wiringFailures.length) failed++;
+const total = CASES.length + AGY_CASES.length + 1;
 console.log(`\n${total - failed}/${total} 통과`);
 process.exit(failed === 0 ? 0 : 1);
