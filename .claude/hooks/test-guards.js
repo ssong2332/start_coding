@@ -233,6 +233,17 @@ CASES.push(
   ["block-env-access.js", ps(`Add-Content ${E} x`), "BLOCK", "[PowerShell] Add-Content 덧붙이기"],
   ["block-env-access.js", ps(`'x' | Out-File ${E}`), "BLOCK", "[PowerShell] Out-File 덮어쓰기"],
   ["block-env-access.js", ps(`echo x > .\\${E}`), "BLOCK", "[PowerShell] .\\ 경로 리다이렉션"],
+  // 05d48f5 재리뷰 권고 N1 — .NET·cmdlet 쓰기·이동·삭제
+  ["block-env-access.js", ps(`[IO.File]::WriteAllText('${E}','x')`), "BLOCK", "[PowerShell] .NET WriteAllText"],
+  ["block-env-access.js", ps(`[IO.File]::AppendAllText('${E}','x')`), "BLOCK", "[PowerShell] .NET AppendAllText"],
+  ["block-env-access.js", ps(`Move-Item x ${E}`), "BLOCK", "[PowerShell] Move-Item으로 덮어쓰기"],
+  ["block-env-access.js", ps(`Rename-Item ${E} y`), "BLOCK", "[PowerShell] Rename-Item"],
+  ["block-env-access.js", ps(`Remove-Item ${E}`), "BLOCK", "[PowerShell] Remove-Item 삭제"],
+  // 재리뷰 권고 N3 — 오탐 방지 회귀
+  ["block-env-access.js", ps(`New-Item -ItemType File ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더 생성"],
+  ["block-env-access.js", ps(`git add ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더 스테이징"],
+  ["block-env-access.js", ps(`Get-Content ${E}ironment.txt`), "ALLOW", "[PowerShell] .env로 시작하는 다른 파일 이름"],
+  ["block-env-access.js", ps(`node -e "console.log(process${E}.HOME)"`), "ALLOW", "[PowerShell] process.env 식별자"],
   ["block-env-access.js", ps(`Test-Path ${E}`), "ALLOW", "[PowerShell] 존재 확인은 내용을 드러내지 않는다"],
   ["block-env-access.js", ps(`$env:PATH`), "ALLOW", "[PowerShell] 환경 변수 드라이브는 파일이 아니다"],
   ["block-main-writes.js", ps("git reset `\n--hard"), "BLOCK", "[PowerShell] 백틱 줄 이어쓰기 (권고 3)"],
