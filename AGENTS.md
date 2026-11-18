@@ -263,7 +263,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | tdd-practitioner | Red-Green-Refactor 절차, 테스트 케이스 도출 기준, 부실 테스트 방지 체크리스트 | implementer, quality-assurance |
 | root-cause-debugging | 실패 원인 진단 절차 (재현 → 위치 좁히기 → 최소화 → 근본 수정 → 재발 방지), 재현 불가 분기표, 에러 출력 비신뢰 규칙 | implementer (진단·수정), quality-assurance·reviewer (진단까지만) |
 | clean-architecture | 계층 분리, 의존성 역전, DTO 경계, 순환 참조 금지 | architect, implementer, reviewer |
-| security-audit | 시크릿·주입·인증/인가(IDOR)·입력 검증 체크리스트 | reviewer, implementer, 보안 요구 시 architect |
+| security-audit | 시크릿·주입·인증/인가(IDOR)·입력 검증·웹 요청 보호·의존성 공급망 체크리스트 | reviewer, implementer, 보안 요구 시 architect |
 | web-performance | Core Web Vitals, 렌더링 최적화, 접근성(a11y) | 웹 프로젝트의 implementer, quality-assurance, reviewer |
 | vibe-mode | 6-에이전트 파이프라인·승인 게이트를 우회하는 대안 경로(짧은 인터뷰 5항목·서브에이전트 미호출·main 직접 커밋 금지). **사용자가 명시적으로 요청했을 때만** 시작 — 이 표의 다른 스킬·정식 파이프라인을 대체하지 않는다 | 메인 세션 (사용자가 vibe 진행을 요청했을 때만) |
 | learn-mode | 학습 모드 — 사용자가 설계를 먼저 말하고 AI가 피드백·개념 설명·합의된 구현을 맡는다(`nykooi1/vibe-wise` 행동 규칙 차용). 승인 게이트·금지 규칙은 그대로이고, 메인 세션이 사용자에게 결정을 넘기는 방식만 바꾼다. **사용자가 명시적으로 켰을 때만** 시작하며, Claude Code에서는 SessionStart 훅이 켜진 상태를 세션마다 이어 준다 | 메인 세션 (사용자가 학습 모드를 켰을 때만) |
