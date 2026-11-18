@@ -3,8 +3,7 @@
 // 정상 흐름이라(docs/GitWorkflow.md) 강제 push만 막는다.
 // 플래그 대소문자(-D와 -d, -S와 -s)가 의미를 가르므로 정규식에 i 플래그를 쓰지 않고 실행 파일 이름만 대소문자를 무시한다.
 // 한계: 다른 가드와 같은 문자열 검사라 echo 문자열 안의 언급도 차단한다(안전 쪽 오탐).
-// 범위 밖(의도): 원격 브랜치 삭제 push(:x, --delete, --mirror), branch -f 이동, checkout -f, stash drop,
-// 파일 하나 되돌리기(checkout -- file) — 필요해지면 케이스부터 추가한다.
+// 범위 밖(의도): branch -f 이동, checkout -f, 파일 하나 되돌리기(checkout -- file) — 필요해지면 케이스부터 추가한다.
 
 // git 전역 옵션(-C 경로, -c k=v, --no-pager, -P, --git-dir[=]x 등)을 몇 개든 건너뛴다 — a59c376 리뷰 치명 1
 const GLOBAL_OPT = String.raw`(?:-[cC]\s+\S+|--(?:git-dir|work-tree|namespace|super-prefix|config-env|exec-path)\s+(?!-)\S+|--[\w-]+(?:=\S+)?|-[pP])\s+`;
@@ -30,6 +29,12 @@ const RULES = [
     (c) => new RegExp(`${GIT}push\\b${SEG}\\s(?:--force(?![-\\w])|-[a-zA-Z]*f[a-zA-Z]*\\b|["']?\\+[\\w./-])`).test(c),
     "강제 git push (--force-with-lease는 허용)",
   ],
+  [
+    // 원격 브랜치 삭제(--delete, -d, 빈 소스 refspec :x)와 미러 push — 2026-11-18 범위 확장
+    (c) => new RegExp(`${GIT}push\\b${SEG}\\s(?:--delete\\b|--mirror\\b|-[a-zA-Z]*d[a-zA-Z]*\\b|["']?:[\\w./-])`).test(c),
+    "원격 브랜치 삭제·미러 git push",
+  ],
+  [(c) => new RegExp(`${GIT}stash\\s+(?:drop|clear)\\b`).test(c), "git stash drop/clear (보관한 변경 폐기)"],
   [
     (c) => anySegment(c, "checkout", (s) => WHOLE_TREE.test(s)),
     "git checkout . (작업 트리 변경 전체 폐기)",

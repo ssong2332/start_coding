@@ -172,6 +172,17 @@ const CASES = [
   ["block-main-writes.js", bash("git -c user.name=x log -1"), "ALLOW", "전역 옵션 뒤 무관한 하위 명령"],
   ["block-main-writes.js", bash("git checkout main && git checkout ."), "BLOCK", "같은 하위 명령이 두 번 — 두 번째 구간"],
   ["block-main-writes.js", bash("git branch -d a; git branch -D b"), "BLOCK", "두 번째 branch 구간의 -D"],
+  // 2026-11-18 범위 확장 — 원격 브랜치 삭제·미러 push, stash 폐기
+  ["block-main-writes.js", bash(`${GP} origin --delete feat/x`), "BLOCK", "원격 브랜치 삭제 push"],
+  ["block-main-writes.js", bash(`${GP} origin -d feat/x`), "BLOCK", "원격 브랜치 삭제 단축형"],
+  ["block-main-writes.js", bash(`${GP} origin :feat/x`), "BLOCK", "빈 소스 refspec으로 원격 삭제"],
+  ["block-main-writes.js", bash(`${GP} --mirror origin`), "BLOCK", "미러 push (원격 ref 덮어쓰기·삭제)"],
+  ["block-main-writes.js", bash(`${GP} -u origin feat/x`), "ALLOW", "새 브랜치 업스트림 설정 push"],
+  ["block-main-writes.js", bash(`${GP} origin main:main`), "ALLOW", "콜론 refspec이지만 소스가 있음"],
+  ["block-main-writes.js", bash("git stash drop"), "BLOCK", "stash 하나 폐기"],
+  ["block-main-writes.js", bash("git stash clear"), "BLOCK", "stash 전체 폐기"],
+  ["block-main-writes.js", bash("git stash list"), "ALLOW", "stash 목록 보기"],
+  ["block-main-writes.js", bash("git stash pop"), "ALLOW", "stash 적용 (충돌 시 보존됨)"],
   // block-main-writes — 실행 시점 브랜치에 좌우되는 케이스 (파일 헤더의 문서화된 한계)
   [
     "block-main-writes.js",
@@ -282,6 +293,12 @@ const AGY_CASES = [
   [agy("git branch -df x"), "BLOCK", "[agy] branch -df"],
   [agy(`${GP} --force-with-lease origin x`), "ALLOW", "[agy] 안전한 강제 push"],
   [agy("git restore --staged ."), "ALLOW", "[agy] 스테이징만 취소"],
+  // 2026-11-18 — 안티그래비티 파일 도구 경로의 .env 판정도 대소문자 무시 (Claude 가드와 맞춤)
+  [{ toolCall: { name: "view_file", args: { AbsolutePath: `C:\\p\\${E.toUpperCase()}` } } }, "BLOCK", "[agy] 대문자 .ENV 파일 열기"],
+  [{ toolCall: { name: "view_file", args: { AbsolutePath: `C:\\p\\${E}.example` } } }, "ALLOW", "[agy] 플레이스홀더 열기"],
+  [agy(`gc ${E}|sls KEY`), "BLOCK", "[agy] PowerShell 붙여 쓴 읽기"],
+  [agy(`Set-Content ${E} x`), "BLOCK", "[agy] PowerShell 덮어쓰기"],
+  [agy(`Get-Content ${E}.example`), "ALLOW", "[agy] 플레이스홀더 읽기"],
 ];
 
 let failed = 0;

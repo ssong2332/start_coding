@@ -63,7 +63,8 @@ function main() {
       const isEnvPath = (p) => {
         if (typeof p !== "string") return false;
         const base = p.replace(/\\/g, "/").split("/").pop() || "";
-        return /^\.env(\..+)?$/.test(base) && base !== ".env.example";
+        // Windows 파일 시스템은 대소문자를 가리지 않는다 — .claude/hooks/block-env-access.js와 같은 규칙(함께 고칠 것)
+        return /^\.env(\..+)?$/i.test(base) && base.toLowerCase() !== ".env.example";
       };
 
       // 1. 파일 도구에서 .env 접근 검사
@@ -83,12 +84,13 @@ function main() {
         const command = args.CommandLine;
         if (typeof command === "string") {
           // 2-1. .env 명령행 노출 검사
-          const envRefPattern = /(^|[\s"'`/\\:])\.env(?!\.example\b)(\.\w+)?(?=[\s"'`/\\:)]|$)/;
+          // .claude/hooks/block-env-access.js의 셸 규칙과 같다 — Windows run_command는 PowerShell 명령을 받는다(함께 고칠 것)
+          const envRefPattern = /(^|[\s"'`/\\:(])\.env(?!\.example\b)(\.\w+)?(?=[\s"'`/\\:);|,*?}\]]|$)/i;
           if (envRefPattern.test(command)) {
             const revealsOrOverwrites =
-              /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk)\b/i.test(
+              /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk|Copy-Item|cpi|Import-Csv|ipcsv|sls|ii|Invoke-Item|ReadAll\w*|ReadLines|OpenText|StreamReader|Set-Content|sc|Add-Content|ac|Out-File|WriteAll\w*|AppendAll\w*|Move-Item|mi|move|Rename-Item|rni|ren|Remove-Item|ri|rm|del|erase)\b/i.test(
                 command
-              ) || />>?\s*['"]?\.env(?!\.example\b)/.test(command);
+              ) || />>?\s*['"]?(?:\.[\\/])?\.env(?!\.example\b)/i.test(command);
 
             if (revealsOrOverwrites) {
               output({
