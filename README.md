@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File scripts/init.ps1 -ProjectName "프로�
 bash scripts/init.sh "프로젝트명"
 ```
 
-3. **Codex를 쓸 계획이면 먼저 `/hooks`로 훅 정의를 신뢰 승인한다** — 승인 전에는 main 직접 커밋·되돌릴 수 없는 git 명령·`.env` 접근 차단이 조용히 무동작한다. 안티그래비티 훅은 루트와 `.agents` cwd용 진입점을 사용한다. 실제 앱 연결은 `git status` 같은 읽기 명령으로 재확인한다. 실제 `.env` 파일을 열어 시험하지 않는다.
+3. **Codex를 쓸 계획이면 먼저 `/hooks`로 훅 정의를 신뢰 승인한다** — 승인 전에는 main 직접 커밋·되돌릴 수 없는 git 명령·`.env` 접근 차단이 조용히 무동작한다(Claude Code에서는 셸 가드가 Bash·PowerShell 도구 모두에 걸린다). 안티그래비티 훅은 루트와 `.agents` cwd용 진입점을 사용한다. 실제 앱 연결은 `git status` 같은 읽기 명령으로 재확인한다. 실제 `.env` 파일을 열어 시험하지 않는다.
 4. 아이디어를 **Claude Code 메인 세션**에 말한다 → 메인 세션이 **대화형 인터뷰**로 명세를 완성한 뒤 `docs/PRD.md`가 작성된다 (파이프라인 0~1단계). Codex·안티그래비티는 인터뷰를 시작하지 않는다 ([AGENTS.md "메인 오케스트레이터" 문단](AGENTS.md#개발-파이프라인) 참조)
 5. Claude Code / Codex / 안티그래비티 어느 도구로 열어도 같은 규칙(AGENTS.md)이 적용된다. **메인 오케스트레이터는 Claude Code 세션**이고, Codex·안티그래비티는 같은 폴더에서 작업 하나를 맡는 실행자다 — Claude가 CLI로 위임하거나, 사용자가 같은 폴더를 해당 도구로 열어 직접 지시한다. 절차는 [AGENTS.md의 핸드오프 절](AGENTS.md#다른-도구-세션과의-핸드오프)과 `.claude/skills/cli-delegate/SKILL.md`.
 
