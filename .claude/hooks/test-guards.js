@@ -209,6 +209,35 @@ CASES.push(
   [noLib, bash("git status"), "ALLOW", "[모듈 없음] 대체 경로가 정상 명령을 막지 않음"]
 );
 
+// PowerShell 도구 경로 — Claude Code는 Bash 말고 PowerShell 도구로도 셸 명령을 실행한다(2026-11-18 사용자 지시 "연결해").
+// 같은 payload 스키마(tool_name/tool_input.command)로 가드가 똑같이 판정해야 한다.
+const ps = (command) => ({ tool_name: "PowerShell", tool_input: { command } });
+CASES.push(
+  ["block-env-access.js", ps(`Get-Content ${E}`), "BLOCK", "[PowerShell] 시크릿 파일 읽기"],
+  ["block-env-access.js", ps(`Copy-Item ${E} x.txt`), "BLOCK", "[PowerShell] Copy-Item으로 복사"],
+  ["block-env-access.js", ps(`[IO.File]::ReadAllText('${E}')`), "BLOCK", "[PowerShell] .NET 직접 읽기"],
+  ["block-env-access.js", ps(`Get-Content ${E}.example`), "ALLOW", "[PowerShell] 플레이스홀더는 허용"],
+  ["block-no-verify.js", ps(`${GC} --no-` + "verify -m x"), "BLOCK", "[PowerShell] 훅 우회 플래그"],
+  ["block-main-writes.js", ps("git reset --hard"), "BLOCK", "[PowerShell] 되돌릴 수 없는 git 명령"],
+  ["block-main-writes.js", ps("git status"), "ALLOW", "[PowerShell] 평범한 git 명령"],
+  ["confirm-agy-delegate.js", ps(`agy --dangerously-skip-permissions -p x`), "ASK", "[PowerShell] 권한 우회 위임"]
+);
+
+// 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
+// 스크립트가 PowerShell 입력을 판정할 수 있어도 배선이 없으면 실행되지 않는다(2026-11-18 이 세션에서 실제로 열려 있던 공백).
+const settings = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "settings.json"), "utf8"));
+const shellGuards = ["block-main-writes.js", "block-no-verify.js", "block-env-access.js", "confirm-agy-delegate.js"];
+const wiringFailures = [];
+for (const tool of ["Bash", "PowerShell"]) {
+  const wired = (settings.hooks?.PreToolUse || [])
+    .filter((e) => new RegExp(`^(?:${e.matcher})$`).test(tool))
+    .flatMap((e) => e.hooks.map((h) => h.command));
+  for (const g of shellGuards) {
+    const ok = wired.some((c) => c.includes(g));
+    if (!ok) wiringFailures.push(`${tool} → ${g}`);
+  }
+}
+
 // 안티그래비티 경로(scripts/agy-guard.js 2-2b)도 같은 판정 모듈로 막는지 — a59c376 리뷰 권고 7.
 // agy는 종료 코드가 아니라 stdout의 decision으로 답하므로 BLOCK/ALLOW로 옮겨 같은 표에 넣는다.
 const agyGuard = path.resolve(__dirname, "..", "..", "scripts", "agy-guard.js");
@@ -242,6 +271,8 @@ for (const [script, payload, expected, why] of CASES) {
   fs.rmSync(noLibDir, { recursive: true, force: true });
 }
 
-const total = CASES.length + AGY_CASES.length;
+console.log(`${wiringFailures.length ? " FAIL " : "  ok  "} ${"settings.json".padEnd(22)} 셸 가드 4종이 Bash·PowerShell 둘 다에 배선됨${wiringFailures.length ? " — 누락: " + wiringFailures.join(", ") : ""}`);
+if (wiringFailures.length) failed++;
+const total = CASES.length + AGY_CASES.length + 1;
 console.log(`\n${total - failed}/${total} 통과`);
 process.exit(failed === 0 ? 0 : 1);

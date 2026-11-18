@@ -294,7 +294,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 
 ## 강제 장치 (도구별)
 
-규칙의 원본은 언제나 이 문서다 — 여기서 규칙을 지우면 훅만 남고 근거가 사라진다. 훅은 도구가 지원할 때 추가로 물리 차단하는 계층이다: Claude Code는 `.claude/settings.json`, Codex는 `.codex/hooks.json`(같은 `.claude/hooks/` 가드 재사용), 안티그래비티는 `.agents/hooks.json` → `scripts/agy-guard.js`. 세 도구 공통 차단 대상은 main 직접 커밋, 병합 없는 refspec push, 되돌릴 수 없는 git 명령(reset --hard·clean -f·branch -D·강제 push·checkout/restore .), 훅 우회 플래그, `.env` 접근이다.
+규칙의 원본은 언제나 이 문서다 — 여기서 규칙을 지우면 훅만 남고 근거가 사라진다. 훅은 도구가 지원할 때 추가로 물리 차단하는 계층이다: Claude Code는 `.claude/settings.json`(셸 가드는 Bash·PowerShell 도구 둘 다), Codex는 `.codex/hooks.json`(같은 `.claude/hooks/` 가드 재사용), 안티그래비티는 `.agents/hooks.json` → `scripts/agy-guard.js`. 세 도구 공통 차단 대상은 main 직접 커밋, 병합 없는 refspec push, 되돌릴 수 없는 git 명령(reset --hard·clean -f·branch -D·강제 push·checkout/restore .), 훅 우회 플래그, `.env` 접근이다.
 
 **Codex는 최초 1회 `/hooks`로 훅 정의를 신뢰 승인해야 실행된다** — 승인 전에는 조용히 무동작이므로 새 프로젝트에서 반드시 확인한다. 훅 전체 목록(확인·알림·주입 훅 포함), 도구별 활성 조건·cwd 전제는 `.claude/hooks/README.md`가 원본이다.
 

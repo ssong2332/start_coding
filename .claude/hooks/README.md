@@ -41,6 +41,8 @@
 | `learn-mode-session.js` | 주입 훅 (SessionStart) | 차단하지 않는다. `.artifacts/learn-mode/profile.md`에 `Learning mode: active`가 있으면 세션 시작·재개·압축 때 `.agents/skills/learn-mode/SKILL.md`와 상태 파일을 읽으라는 안내를 컨텍스트에 넣는다. 아무것도 쓰지 않고, 판단할 수 없으면 조용히 끝난다 (Claude Code에만 배선). 회귀 테스트는 `node .claude/hooks/test-learn-mode.js` |
 | `contract-check.js` | 노티파이어 | 규칙 문서 간 모순 7종(C1~C7) 검사 결과를 알림 (Claude Code에서만 자동 실행) |
 
+**Claude Code 셸 도구 두 종 (2026-11-18)**: Claude Code는 셸 명령을 `Bash` 도구뿐 아니라 `PowerShell` 도구(Windows)로도 실행한다. `.claude/settings.json`의 셸 가드 matcher는 `Bash|PowerShell`이고, `block-env-access.js`는 두 도구의 `tool_input.command`를 같은 규칙으로 본다(PowerShell 고유 읽기·복사 명령 `Copy-Item`·`[IO.File]::ReadAll*`·`Import-Csv` 포함). 이전에는 matcher가 `Bash`뿐이라 PowerShell 도구로 실행한 git·`.env` 명령이 가드를 거치지 않았다 — Bash 도구가 셸 초기화 오류로 쓸 수 없던 세션에서 PowerShell로 대신 작업하다 발견. `test-guards.js`가 PowerShell 입력 판정과 이 배선을 함께 확인한다.
+
 `block-env-access.js`는 Codex의 `apply_patch`도 처리한다 — 그 도구는 파일 경로가 아니라 **패치 본문**을 `tool_input.command`에 담으므로 `*** Add/Update/Delete File:` 줄에서 대상 경로를 파싱한다.
 
 **근거 기록 (matcher·인자명 출처)**: `.codex/hooks.json`의 matcher(`Bash|shell|local_shell`, `apply_patch|Read|Edit|Write|Grep` — 2026-08-18 재검토에서 두 번째 matcher에 `Grep`이 빠져 있던 것을 발견해 추가, Claude Code 쪽 matcher와 대칭 확보)와 `.agents/hooks.json`의 파일 인자명(`AbsolutePath`·`TargetFile`·`SearchPath`·`DirectoryPath`)은 Codex `codex-cli 0.148.0-alpha.9` 실측(로컬 `~/.codex/hooks.json`의 impeccable 훅 배선 관찰)과 [learn.chatgpt.com/docs/hooks](https://learn.chatgpt.com/docs/hooks)·[antigravity.google/docs/ide/hooks](https://antigravity.google/docs/ide/hooks)를 근거로 정했다. 도구 버전이 바뀌어 이름이 달라지면 훅 로드 또는 matcher가 실패할 수 있으므로 실제 도구 호출과 가상 경로 payload 회귀 검사를 재실행한다. 실제 .env 파일은 열지 않는다.

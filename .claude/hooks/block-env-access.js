@@ -52,7 +52,8 @@ readHookInput((payload) => {
     process.exit(0);
   }
 
-  if (toolName === "Bash") {
+  // PowerShell 도구도 같은 셸 명령 문자열을 받는다 (2026-11-18 PowerShell 배선)
+  if (toolName === "Bash" || toolName === "PowerShell") {
     const command = ti.command;
     if (typeof command !== "string") process.exit(0);
 
@@ -62,7 +63,7 @@ readHookInput((payload) => {
     if (!envRefPattern.test(command)) process.exit(0);
 
     const revealsOrOverwrites =
-      /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk)\b/i.test(
+      /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk|Copy-Item|cpi|ReadAll\w*|Import-Csv)\b/i.test(
         command
       ) || />>?\s*['"]?\.env(?!\.example\b)/.test(command);
 
