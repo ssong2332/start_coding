@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // PreToolUse 가드 (Edit/Write/MultiEdit/NotebookEdit, Codex apply_patch): 이미 있는 린터·포매터 설정과
 // 그 ignore 파일의 수정을 막는다. 에이전트가 코드를 고치는 대신 검사 설정을 약하게 만들어 통과시키는 것을 막고,
-// AGENTS.md 금지 "포매터·린터 설정에서 .claude/·docs/ 등을 대상 제외하지 않는 것 금지"를 물리적으로 지킨다.
+// AGENTS.md 금지 "포매터·린터 설정에서 .claude/·docs/ 등을 대상 제외하지 않는 것 금지"를 파일 도구 경로에서 강제한다.
+// 한계(최선 노력 계층): 셸(Bash·PowerShell)로 쓰는 경우(sed -i, >>, Set-Content, mv)와 다른 이름의 심볼릭 링크를
+// 거친 쓰기는 막지 못한다 — 규칙 자체가 최종 방벽이다.
 // 처음 만드는 것은 허용한다(T-01 하네스 구축 등 — 약하게 만들 기존 설정이 없다).
 // affaan-m/ECC scripts/hooks/config-protection.js(MIT) 개념 차용, 2026-11-18.
 //

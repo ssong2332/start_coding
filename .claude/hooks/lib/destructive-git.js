@@ -1,6 +1,6 @@
 // 되돌릴 수 없는 git 명령 판정 — block-main-writes.js(Claude·Codex)와 scripts/agy-guard.js가 공유한다.
 // mattpocock/skills의 git-guardrails 개념 차용. 원본은 push 전체를 막지만 이 킷은 병합 후 push가
-// 정상 흐름이라(docs/GitWorkflow.md) 강제 push만 막는다.
+// 정상 흐름이라(docs/GitWorkflow.md) 강제·원격 삭제·미러 push만 막는다.
 // 플래그 대소문자(-D와 -d, -S와 -s)가 의미를 가르므로 정규식에 i 플래그를 쓰지 않고 실행 파일 이름만 대소문자를 무시한다.
 // 한계: 다른 가드와 같은 문자열 검사라 echo 문자열 안의 언급도 차단한다(안전 쪽 오탐).
 // 범위 밖(의도): branch -f 이동, checkout -f, 파일 하나 되돌리기(checkout -- file) — 필요해지면 케이스부터 추가한다.

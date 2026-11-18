@@ -179,6 +179,9 @@ const CASES = [
   ["block-main-writes.js", bash(`${GP} --mirror origin`), "BLOCK", "미러 push (원격 ref 덮어쓰기·삭제)"],
   ["block-main-writes.js", bash(`${GP} -u origin feat/x`), "ALLOW", "새 브랜치 업스트림 설정 push"],
   ["block-main-writes.js", bash(`${GP} origin main:main`), "ALLOW", "콜론 refspec이지만 소스가 있음"],
+  ["block-main-writes.js", bash(`${GP} -q origin main`), "ALLOW", "-q 조용히 push (리뷰 권고 — 오탐 회귀)"],
+  ["block-main-writes.js", bash(`${GP} --dry-run origin feat/x`), "ALLOW", "--dry-run (d로 시작하지만 긴 옵션)"],
+  ["block-main-writes.js", bash(`${GP} origin HEAD:refs/heads/feat/x`), "ALLOW", "HEAD:refs 형태"],
   ["block-main-writes.js", bash("git stash drop"), "BLOCK", "stash 하나 폐기"],
   ["block-main-writes.js", bash("git stash clear"), "BLOCK", "stash 전체 폐기"],
   ["block-main-writes.js", bash("git stash list"), "ALLOW", "stash 목록 보기"],
@@ -283,7 +286,11 @@ CASES.push(
   [PLC, { tool_name: "Read", tool_input: { file_path: cfg(".eslintrc.json") } }, "ALLOW", "읽기는 허용"],
   [PLC, { tool_name: "MultiEdit", tool_input: { file_path: cfg("a.js"), edits: [{ file_path: cfg(".eslintrc.json") }] } }, "BLOCK", "MultiEdit 항목별 경로"],
   [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg(".eslintrc.json")}\n@@\n-a\n+b\n` } }, "BLOCK", "[Codex] apply_patch로 기존 설정 수정"],
-  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Add File: ${cfg("biome.json")}\n+{}\n` } }, "ALLOW", "[Codex] apply_patch로 새 설정 만들기"]
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Add File: ${cfg("biome.json")}\n+{}\n` } }, "ALLOW", "[Codex] apply_patch로 새 설정 만들기"],
+  // 2b50c7a 리뷰 권고 3 — 코드가 처리하는 나머지 경로
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Delete File: ${cfg(".prettierignore")}\n` } }, "BLOCK", "[Codex] apply_patch로 기존 ignore 삭제"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg("a.js")}\n*** Move to: ${cfg(".eslintrc.json")}\n` } }, "BLOCK", "[Codex] 다른 파일을 기존 설정 위치로 이동"],
+  [PLC, { tool_name: "NotebookEdit", tool_input: { notebook_path: cfg(".eslintrc.json") } }, "BLOCK", "NotebookEdit notebook_path 인자"]
 );
 
 // 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
