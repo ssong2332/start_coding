@@ -12,7 +12,8 @@
       {
         "matcher": "apply_patch|Read|Edit|Write|Grep",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/block-env-access.js", "timeout": 10, "statusMessage": "시크릿 보호" }
+          { "type": "command", "command": "node .claude/hooks/block-env-access.js", "timeout": 10, "statusMessage": "시크릿 보호" },
+          { "type": "command", "command": "node .claude/hooks/protect-lint-config.js", "timeout": 10, "statusMessage": "린터 설정 보호" }
         ]
       }
     ]

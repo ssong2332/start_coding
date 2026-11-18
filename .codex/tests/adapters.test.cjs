@@ -75,7 +75,8 @@ function wiring(config) {
   assert.deepEqual(shell[0].hooks.map(h => h.command), [
     'node .claude/hooks/block-main-writes.js', 'node .claude/hooks/block-no-verify.js', 'node .claude/hooks/block-env-access.js',
   ]);
-  assert.deepEqual(patch[0].hooks.map(h => h.command), ['node .claude/hooks/block-env-access.js']);
+  // protect-lint-config: 기존 린터·포매터 설정 수정 차단 (2026-11-18 추가 — Read·Grep 호출에는 아무것도 하지 않는다)
+  assert.deepEqual(patch[0].hooks.map(h => h.command), ['node .claude/hooks/block-env-access.js', 'node .claude/hooks/protect-lint-config.js']);
   for (const entry of entries) for (const hook of entry.hooks) {
     assert.equal(hook.type, 'command');
     assert.equal(hook.timeout, 10);

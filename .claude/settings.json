@@ -22,6 +22,12 @@
         "hooks": [
           { "type": "command", "command": "node .claude/hooks/block-env-access.js" }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/protect-lint-config.js" }
+        ]
       }
     ],
     "PostToolUse": [

@@ -172,6 +172,20 @@ const CASES = [
   ["block-main-writes.js", bash("git -c user.name=x log -1"), "ALLOW", "전역 옵션 뒤 무관한 하위 명령"],
   ["block-main-writes.js", bash("git checkout main && git checkout ."), "BLOCK", "같은 하위 명령이 두 번 — 두 번째 구간"],
   ["block-main-writes.js", bash("git branch -d a; git branch -D b"), "BLOCK", "두 번째 branch 구간의 -D"],
+  // 2026-11-18 범위 확장 — 원격 브랜치 삭제·미러 push, stash 폐기
+  ["block-main-writes.js", bash(`${GP} origin --delete feat/x`), "BLOCK", "원격 브랜치 삭제 push"],
+  ["block-main-writes.js", bash(`${GP} origin -d feat/x`), "BLOCK", "원격 브랜치 삭제 단축형"],
+  ["block-main-writes.js", bash(`${GP} origin :feat/x`), "BLOCK", "빈 소스 refspec으로 원격 삭제"],
+  ["block-main-writes.js", bash(`${GP} --mirror origin`), "BLOCK", "미러 push (원격 ref 덮어쓰기·삭제)"],
+  ["block-main-writes.js", bash(`${GP} -u origin feat/x`), "ALLOW", "새 브랜치 업스트림 설정 push"],
+  ["block-main-writes.js", bash(`${GP} origin main:main`), "ALLOW", "콜론 refspec이지만 소스가 있음"],
+  ["block-main-writes.js", bash(`${GP} -q origin main`), "ALLOW", "-q 조용히 push (리뷰 권고 — 오탐 회귀)"],
+  ["block-main-writes.js", bash(`${GP} --dry-run origin feat/x`), "ALLOW", "--dry-run (d로 시작하지만 긴 옵션)"],
+  ["block-main-writes.js", bash(`${GP} origin HEAD:refs/heads/feat/x`), "ALLOW", "HEAD:refs 형태"],
+  ["block-main-writes.js", bash("git stash drop"), "BLOCK", "stash 하나 폐기"],
+  ["block-main-writes.js", bash("git stash clear"), "BLOCK", "stash 전체 폐기"],
+  ["block-main-writes.js", bash("git stash list"), "ALLOW", "stash 목록 보기"],
+  ["block-main-writes.js", bash("git stash pop"), "ALLOW", "stash 적용 (충돌 시 보존됨)"],
   // block-main-writes — 실행 시점 브랜치에 좌우되는 케이스 (파일 헤더의 문서화된 한계)
   [
     "block-main-writes.js",
@@ -253,6 +267,32 @@ CASES.push(
   ["confirm-agy-delegate.js", ps(`agy --dangerously-skip-permissions -p x`), "ASK", "[PowerShell] 권한 우회 위임"]
 );
 
+// protect-lint-config — 이미 있는 린터·포매터 설정·ignore 파일 수정 차단, 새로 만들기는 허용
+// (affaan-m/ECC scripts/hooks/config-protection.js 개념 차용, 2026-11-18). 파일 존재 여부로 판정하므로
+// OS 임시 폴더에 fixture를 만들고 이 실행이 끝날 때 지운다.
+const cfgDir = fs.mkdtempSync(path.join(os.tmpdir(), "guard-lintcfg-"));
+for (const f of [".eslintrc.json", "eslint.config.base.mjs", ".prettierignore", "vite.config.ts"]) {
+  fs.writeFileSync(path.join(cfgDir, f), "{}");
+}
+const cfg = (name) => path.join(cfgDir, name);
+const PLC = "protect-lint-config.js";
+CASES.push(
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".eslintrc.json") } }, "BLOCK", "기존 ESLint 설정 수정"],
+  [PLC, { tool_name: "Write", tool_input: { file_path: cfg(".ESLINTRC.JSON") } }, "BLOCK", "대소문자만 다른 같은 파일 (NTFS)"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg("eslint.config.base.mjs") } }, "BLOCK", "분할된 공용 설정 파일"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg(".prettierignore") } }, "BLOCK", "ignore 목록에 경로 추가로 검사 회피"],
+  [PLC, { tool_name: "Write", tool_input: { file_path: cfg(".prettierrc.json") } }, "ALLOW", "설정이 없을 때 새로 만들기 (T-01 하네스 구축)"],
+  [PLC, { tool_name: "Edit", tool_input: { file_path: cfg("vite.config.ts") } }, "ALLOW", "빌드 설정은 대상 아님"],
+  [PLC, { tool_name: "Read", tool_input: { file_path: cfg(".eslintrc.json") } }, "ALLOW", "읽기는 허용"],
+  [PLC, { tool_name: "MultiEdit", tool_input: { file_path: cfg("a.js"), edits: [{ file_path: cfg(".eslintrc.json") }] } }, "BLOCK", "MultiEdit 항목별 경로"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg(".eslintrc.json")}\n@@\n-a\n+b\n` } }, "BLOCK", "[Codex] apply_patch로 기존 설정 수정"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Add File: ${cfg("biome.json")}\n+{}\n` } }, "ALLOW", "[Codex] apply_patch로 새 설정 만들기"],
+  // 2b50c7a 리뷰 권고 3 — 코드가 처리하는 나머지 경로
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Delete File: ${cfg(".prettierignore")}\n` } }, "BLOCK", "[Codex] apply_patch로 기존 ignore 삭제"],
+  [PLC, { tool_name: "apply_patch", tool_input: { command: `*** Update File: ${cfg("a.js")}\n*** Move to: ${cfg(".eslintrc.json")}\n` } }, "BLOCK", "[Codex] 다른 파일을 기존 설정 위치로 이동"],
+  [PLC, { tool_name: "NotebookEdit", tool_input: { notebook_path: cfg(".eslintrc.json") } }, "BLOCK", "NotebookEdit notebook_path 인자"]
+);
+
 // 배선 확인: 셸 가드 4종이 settings.json에서 Bash와 PowerShell 도구 둘 다에 걸려 있어야 한다.
 // 스크립트가 PowerShell 입력을 판정할 수 있어도 배선이 없으면 실행되지 않는다(2026-11-18 이 세션에서 실제로 열려 있던 공백).
 const settings = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "settings.json"), "utf8"));
@@ -267,6 +307,14 @@ for (const tool of ["Bash", "PowerShell"]) {
     if (!ok) wiringFailures.push(`${tool} → ${g}`);
   }
 }
+for (const tool of ["Edit", "Write", "MultiEdit"]) {
+  const wired = (settings.hooks?.PreToolUse || [])
+    .filter((e) => new RegExp(`^(?:${e.matcher})$`).test(tool))
+    .flatMap((e) => e.hooks.map((h) => h.command));
+  if (!wired.some((c) => c.includes(PLC))) wiringFailures.push(`${tool} → ${PLC}`);
+}
+const codexHooks = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "..", ".codex", "hooks.json"), "utf8"));
+if (!JSON.stringify(codexHooks).includes(PLC)) wiringFailures.push(`.codex/hooks.json → ${PLC}`);
 
 // 안티그래비티 경로(scripts/agy-guard.js 2-2b)도 같은 판정 모듈로 막는지 — a59c376 리뷰 권고 7.
 // agy는 종료 코드가 아니라 stdout의 decision으로 답하므로 BLOCK/ALLOW로 옮겨 같은 표에 넣는다.
@@ -282,6 +330,12 @@ const AGY_CASES = [
   [agy("git branch -df x"), "BLOCK", "[agy] branch -df"],
   [agy(`${GP} --force-with-lease origin x`), "ALLOW", "[agy] 안전한 강제 push"],
   [agy("git restore --staged ."), "ALLOW", "[agy] 스테이징만 취소"],
+  // 2026-11-18 — 안티그래비티 파일 도구 경로의 .env 판정도 대소문자 무시 (Claude 가드와 맞춤)
+  [{ toolCall: { name: "view_file", args: { AbsolutePath: `C:\\p\\${E.toUpperCase()}` } } }, "BLOCK", "[agy] 대문자 .ENV 파일 열기"],
+  [{ toolCall: { name: "view_file", args: { AbsolutePath: `C:\\p\\${E}.example` } } }, "ALLOW", "[agy] 플레이스홀더 열기"],
+  [agy(`gc ${E}|sls KEY`), "BLOCK", "[agy] PowerShell 붙여 쓴 읽기"],
+  [agy(`Set-Content ${E} x`), "BLOCK", "[agy] PowerShell 덮어쓰기"],
+  [agy(`Get-Content ${E}.example`), "ALLOW", "[agy] 플레이스홀더 읽기"],
 ];
 
 let failed = 0;
@@ -299,6 +353,7 @@ for (const [script, payload, expected, why] of CASES) {
 }
 } finally {
   fs.rmSync(noLibDir, { recursive: true, force: true });
+  fs.rmSync(cfgDir, { recursive: true, force: true });
 }
 
 console.log(`${wiringFailures.length ? " FAIL " : "  ok  "} ${"settings.json".padEnd(22)} 셸 가드 4종이 Bash·PowerShell 둘 다에 배선됨${wiringFailures.length ? " — 누락: " + wiringFailures.join(", ") : ""}`);
