@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PreToolUse 가드 (Bash): main/master 체크아웃 상태의 `git commit`과,
+// PreToolUse 가드 (Bash·PowerShell): main/master 체크아웃 상태의 `git commit`과,
 // 다른 브랜치를 병합 없이 main/master ref에 직접 써넣는 refspec push를 차단한다.
 // docs/GitWorkflow.md("main 직접 커밋 금지, main은 병합으로만 갱신")를 강제한다.
 // 브랜치와 무관하게 되돌릴 수 없는 git 명령(reset --hard, clean -f, branch -D, 강제 push,

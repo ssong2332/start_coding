@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PreToolUse 가드 (Read/Edit/Write/NotebookEdit/Grep, Bash, Codex apply_patch):
+// PreToolUse 가드 (Read/Edit/Write/NotebookEdit/Grep, Bash·PowerShell, Codex apply_patch):
 // 실제 .env 파일(.env.local 등 변형 포함)의 읽기·수정·출력·덮어쓰기를 차단한다.
 // AGENTS.md "시크릿 관리" 절을 강제한다: 추적·공유는 .env.example만.
 //
@@ -8,7 +8,7 @@
 // 단 Codex의 apply_patch 는 파일 경로가 아니라 패치 본문을 tool_input.command 에
 // 담으므로 별도 분기에서 대상 경로를 파싱한다.
 //
-// Bash 문자열 매칭은 최선 노력 계층이지 보안 경계가 아니다 — 우발적·습관적
+// 셸(Bash·PowerShell) 문자열 매칭은 최선 노력 계층이지 보안 경계가 아니다 — 우발적·습관적
 // 위반을 잡는 용도이며, 의도적 우회는 막지 못한다(.claude/hooks/README.md).
 const { readHookInput } = require("./lib/read-hook-input");
 
@@ -19,7 +19,8 @@ readHookInput((payload) => {
   const isEnvPath = (p) => {
     if (typeof p !== "string") return false;
     const base = p.replace(/\\/g, "/").split("/").pop() || "";
-    return /^\.env(\..+)?$/.test(base) && base !== ".env.example";
+    // Windows 파일 시스템은 대소문자를 가리지 않는다(.ENV도 같은 파일) — 203ce33 리뷰 치명 1
+    return /^\.env(\..+)?$/i.test(base) && base.toLowerCase() !== ".env.example";
   };
 
   const block = (what) => {
@@ -59,13 +60,14 @@ readHookInput((payload) => {
 
     // ".env" 또는 ".env.변형"이 독립 경로 세그먼트로 등장 (.env.example 제외).
     // "process.env" 처럼 식별자 일부인 경우는 앞 문자 조건으로 걸러진다.
-    const envRefPattern = /(^|[\s"'`/\\:])\.env(?!\.example\b)(\.\w+)?(?=[\s"'`/\\:)]|$)/;
+    // 뒤따르는 문자에 PowerShell에서 흔히 붙여 쓰는 ; | , * ? } ] 포함, 대소문자 무시 — 203ce33 리뷰 치명 1
+    const envRefPattern = /(^|[\s"'`/\\:(])\.env(?!\.example\b)(\.\w+)?(?=[\s"'`/\\:);|,*?}\]]|$)/i;
     if (!envRefPattern.test(command)) process.exit(0);
 
     const revealsOrOverwrites =
-      /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk|Copy-Item|cpi|ReadAll\w*|Import-Csv)\b/i.test(
+      /\b(cat|type|more|less|head|tail|bat|Get-Content|gc|Select-String|code|vim|nvim|nano|notepad|cp|copy|scp|curl|tee|grep|rg|findstr|sed|awk|Copy-Item|cpi|Import-Csv|ipcsv|sls|ii|Invoke-Item|ReadAll\w*|ReadLines|OpenText|StreamReader|Set-Content|sc|Add-Content|ac|Out-File)\b/i.test(
         command
-      ) || />>?\s*['"]?\.env(?!\.example\b)/.test(command);
+      ) || />>?\s*['"]?(?:\.[\\/])?\.env(?!\.example\b)/i.test(command);
 
     if (revealsOrOverwrites) block(`.env를 읽거나 덮어쓰는 명령: ${command}`);
   }
