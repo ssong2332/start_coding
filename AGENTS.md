@@ -93,7 +93,7 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 
 ### 앱 서브 세션 (Claude 데스크톱 앱)
 
-위 판정표의 "앱 서브 세션" 행에 해당하면 메인 세션이 앱 서브 세션(사용자가 열어 볼 수 있는 독립 세션)을 만든다. 서브 세션을 만들거나 그 세션과 메시지를 주고받거나 결과를 받기 전에 `.claude/skills/app-subsession/SKILL.md`(Claude 데스크톱 앱 전용 — 생성·지시문·진행 중 질문·보고·검증·후속 지시·제공·병합·정리)를 읽는다.
+위 판정표의 "앱 서브 세션" 행에 해당하면 메인 세션이 앱 서브 세션(사용자가 열어 볼 수 있는 독립 세션)을 만든다. 서브 세션을 만들거나 그 세션과 메시지를 주고받거나 결과를 받기 전에 `.claude/skills/app-subsession/SKILL.md`(Claude 데스크톱 앱 전용 — 생성·지시문·진행 중 질문·보고·검증·후속 지시·제공·병합·정리, 그리고 저장소당 오케스트레이터 하나·현황판·인수인계·보관 정리·막힘 처리·동시 실행 수)를 읽는다.
 
 ## 진행 중 요구사항 변경
 
@@ -251,7 +251,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | .artifacts/verification/ | implementer·quality-assurance (자기 실행의 로그·메타데이터 생성) | 그 외 읽기 전용, 기존 증거 덮어쓰기·삭제 금지 |
 | .codex/EXECUTION.md, .codex/DEVELOPMENT.md, .codex/FRONTEND.md, .codex/tests/ | 사용자 | Codex 실행 결과 수집·개발 보조·UI 지침과 그 연결 검사, 읽기 전용 |
 | .artifacts/learn-mode/ | 메인 세션 (학습 모드 상태 파일 profile.md·progress.md·project-map.md 생성·갱신) | 그 외 읽기 전용. Git 추적 제외 여부는 사용자가 정한다 |
-| .artifacts/handoff/ | 메인 세션(prompt.md 작성)·작업을 받은 세션(앱 서브 세션 포함 — 같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
+| .artifacts/handoff/ | 메인 세션(prompt.md 작성, 오케스트레이터 현황판 `ORCHESTRATOR/board.md` 생성·갱신)·작업을 받은 세션(앱 서브 세션 포함 — 같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
 | 소스 코드 | implementer (메인 세션이 "메인 세션과 서브에이전트 구분" 표에 따라 직접 구현할 때는 implementer 역할로 수정한다 — 역할 원본의 금지·절차·증거 보존·보고 의무 포함) | 읽기 전용 |
 
 ## 공용 스킬 (.agents/skills/)
