@@ -77,6 +77,7 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 | 도구 권한 제한이 안전장치임 | 서브에이전트(tools 제한) |
 | 대량 읽기·출력이 메인 컨텍스트를 오염시킴 | 서브에이전트 |
 | 독립 산출물이 남고 오래 걸림 | 별도 세션(병렬, 필요하면 worktree 격리) |
+| Claude 데스크톱 앱 + 독립 산출물(브랜치·PR·보고 파일)이 남는 작업 하나(T-xx·분석) | 앱 서브 세션(파일을 쓰면 worktree 격리). 메인은 오케스트레이터로 생성·송수신·검증·사용자 보고를 맡는다 |
 | 앞 단계 맥락을 계속 이어받아야 함 | 메인 세션 우선 |
 
 단계별 적용 결과:
@@ -85,14 +86,14 @@ Claude Code는 CLAUDE.md의 `@AGENTS.md` import로, Codex와 안티그래비티�
 |---|---|
 | 아이디어 인터뷰 | 메인 세션 |
 | 기획(planner)·설계(architect) | 서브에이전트. /plan 모드는 이를 대체하지 않고, 메인 세션이 승인된 설계를 바탕으로 구현 순서를 계획할 때 쓴다 |
-| 구현(implementer) | 혼합 — 변경 파일 3개 이하의 짧은 수정, 리뷰·QA 지적 반영, 중간에 사용자 질문이 필요할 가능성이 큰 작업은 메인 세션이 직접. 여러 파일·모듈에 걸친 기능 구현이나 메인 맥락이 이미 긴 경우는 implementer 서브에이전트 |
+| 구현(implementer) | 혼합 — 변경 파일 3개 이하의 짧은 수정, 리뷰·QA 지적 반영, 중간에 사용자 질문이 필요할 가능성이 큰 작업은 메인 세션이 직접. 여러 파일·모듈에 걸친 기능 구현이나 메인 맥락이 이미 긴 경우는 implementer 서브에이전트. Claude 데스크톱 앱에서는 T-xx 단위 구현을 앱 서브 세션에 맡긴다 — 이 행 앞부분(짧은 수정·지적 반영·질문 가능성 큰 작업은 메인 직접)이 우선한다 |
 | 리뷰(reviewer)·검증(quality-assurance)·문서화(docs) | 서브에이전트 |
 
 메인 세션이 직접 구현해도 implementer 역할 원본의 금지·절차·증거 보존·보고 의무는 그대로 적용된다.
 
 ### 앱 서브 세션 (Claude 데스크톱 앱)
 
-위 판정표의 "별도 세션" 행에 해당하면 메인 세션이 앱 서브 세션(사용자가 열어 볼 수 있는 독립 세션)을 만든다. 생성·보고·검증·제공·정리 규칙은 `.claude/skills/app-subsession/SKILL.md`(Claude 데스크톱 앱 전용)에 있다.
+위 판정표의 "앱 서브 세션" 행에 해당하면 메인 세션이 앱 서브 세션(사용자가 열어 볼 수 있는 독립 세션)을 만든다. 서브 세션을 만들거나 그 세션과 메시지를 주고받거나 결과를 받기 전에 `.claude/skills/app-subsession/SKILL.md`(Claude 데스크톱 앱 전용 — 생성·지시문·진행 중 질문·보고·검증·후속 지시·제공·병합·정리)를 읽는다.
 
 ## 진행 중 요구사항 변경
 
@@ -250,7 +251,7 @@ Claude Code 메인 세션이 Codex·안티그래비티에 작업을 넘기는 �
 | .artifacts/verification/ | implementer·quality-assurance (자기 실행의 로그·메타데이터 생성) | 그 외 읽기 전용, 기존 증거 덮어쓰기·삭제 금지 |
 | .codex/EXECUTION.md, .codex/DEVELOPMENT.md, .codex/FRONTEND.md, .codex/tests/ | 사용자 | Codex 실행 결과 수집·개발 보조·UI 지침과 그 연결 검사, 읽기 전용 |
 | .artifacts/learn-mode/ | 메인 세션 (학습 모드 상태 파일 profile.md·progress.md·project-map.md 생성·갱신) | 그 외 읽기 전용. Git 추적 제외 여부는 사용자가 정한다 |
-| .artifacts/handoff/ | 메인 세션(prompt.md 작성)·작업을 받은 세션(같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
+| .artifacts/handoff/ | 메인 세션(prompt.md 작성)·작업을 받은 세션(앱 서브 세션 포함 — 같은 폴더의 report.md 작성) | 그 외 읽기 전용, 기존 파일 덮어쓰기·삭제 금지 |
 | 소스 코드 | implementer (메인 세션이 "메인 세션과 서브에이전트 구분" 표에 따라 직접 구현할 때는 implementer 역할로 수정한다 — 역할 원본의 금지·절차·증거 보존·보고 의무 포함) | 읽기 전용 |
 
 ## 공용 스킬 (.agents/skills/)
