@@ -146,6 +146,7 @@ Lazyweb 선정 근거 (2026-10-02 조사): UI 레퍼런스 MCP 후보 중 무료
 | 이미지·영상 | unsplash, pexels, lummi | 자리 표시용·배경용 사진과 영상이 필요할 때 |
 | 컬러 팔레트 | coolors, color hunt, realtime colors | 색 조합을 정할 때. 대비는 접근성 기준으로 따로 확인한다 |
 | 목업 | shots, mockuuups, previewed, app-mockup.com, ogfolio.com | README·소개 자료용 기기 목업 이미지를 만들 때. app-mockup.com은 앱스토어 스크린샷 디자인용, ogfolio.com은 링크 공유 미리보기(Open Graph) 이미지 사례 모음이라 참고용 |
+| 디자인 시스템 레퍼런스 (DESIGN.md) | getdesign.md (2026-11-26 사용자 지시로 추가) | 유명 웹사이트의 디자인 시스템(색·서체·간격·컴포넌트와 그 이유)을 분석한 `DESIGN.md` 모음(사이트 표기 550개 이상, 2026-11-26 첫 화면 확인). 프로젝트에 넣어 코딩 에이전트의 디자인 기준으로 쓴다 — shadcn 스킬은 DESIGN.md를 적용하는 기능이 있다. **주의**: 로그인·유료 구간(Pro·Catalog Pass·비공개 DESIGN.md 제작)이 있다 — 결제·가입은 사용자가 한다. 실제 브랜드를 분석한 문서라 그대로 따르면 남의 브랜드를 흉내 내게 된다 — 참고용으로 쓰고 로고·고유 표현은 가져오지 않는다. 라이선스·이용 조건 미확인 |
 | 웹사이트 레퍼런스 | inspo.page(접속 시 details.so/inspo로 이동), brandlogo.co, admiretheweb.com, umanmade.com | 화면 구성·UI 패턴·브랜드 로고·모션 사례를 둘러볼 때. 실제 서비스 화면·플로우 검색은 Lazyweb MCP(위 전역 코어)가 맡는다 |
 | 영상 프롬프트 모음 | awesome-opus5-5-videos (`yihui-dev/awesome-opus5-5-videos` — 목록의 "amazing opus 5.5 videos"와 같은 것인지는 이름이 가장 가깝다는 근거뿐이라 추정) | 영상 제작 프롬프트 사례를 찾을 때. 프롬프트를 복사해 쓰는 읽을거리다. 미리보기 링크가 제3자 사이트로 연결된다 |
 
